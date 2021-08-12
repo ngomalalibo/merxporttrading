@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,6 @@ public class User extends PersistingBaseEntity
     private List<Address> address = new ArrayList<>();
     private boolean isVerified;
     private UserScopes scope;
-    // @Transient
-    // private MultipartFile image = null;
     private String fileID;
     private boolean isActive = true;
-    
-    
 }

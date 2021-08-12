@@ -72,4 +72,14 @@ public class UserController
         }
         return ResponseEntity.ok(userService.save(user, file));
     }
+    
+    @PutMapping("/user/verify/{id}")
+    public ResponseEntity<User> verifyUser(@PathVariable String id, @RequestParam(value = "key", required = false) String key) throws IOException
+    {
+        if (!key.equals(API_KEY))
+        {
+            throw new AccessDeniedException("Access denied. Provide a valid Key.");
+        }
+        return ResponseEntity.ok(userService.verifyAccount(id));
+    }
 }

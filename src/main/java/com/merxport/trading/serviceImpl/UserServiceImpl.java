@@ -1,5 +1,6 @@
 package com.merxport.trading.serviceImpl;
 
+import com.merxport.trading.aspect.Loggable;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserScopes;
 import com.merxport.trading.exception.CustomNullPointerException;
@@ -40,6 +41,7 @@ public class UserServiceImpl implements UserService
     @Autowired
     private MongoTemplate mongoTemplate;
     
+    @Loggable
     @Override
     public User save(User user, MultipartFile file) throws IOException
     {
@@ -88,6 +90,7 @@ public class UserServiceImpl implements UserService
         return userRepository.findUsers(false, Sort.by(Sort.Direction.ASC, "firstName")).orElse(null);
     }
     
+    @Loggable
     @Override
     public User deleteUser(String id) throws IOException
     {
@@ -100,6 +103,7 @@ public class UserServiceImpl implements UserService
             UpdateResult updateResult = mongoTemplate.updateFirst(q, update, User.class);
             if (updateResult.wasAcknowledged())
             {
+                user.setActive(false);
                 return user;
             }
             else
@@ -127,6 +131,7 @@ public class UserServiceImpl implements UserService
     
     }
     
+    @Loggable
     @Override
     public User verifyAccount(String id)
     {

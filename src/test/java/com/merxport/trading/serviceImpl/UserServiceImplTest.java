@@ -17,13 +17,15 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -55,32 +57,30 @@ class UserServiceImplTest
     }
     
     @Test
-    void deleteUser()
+    void deleteUser() throws IOException
     {
+        String id = "6115658f6cdc51682a71a084";
+        User user = userService.deleteUser(id);
+        
+        assertFalse(user.isActive());
     }
     
     @Test
     void findUser() throws IOException
     {
-        String id = "61140f43700416074b828450";
+        String id = "6115658f6cdc51682a71a084";
         User user = userService.findUser(id);
+        
+        assertNotNull(user);
         
         File ff = new File("C:/imageGet/team3.jpg");
         
-        if (!Objects.isNull(user))
+        String fileID = user.getFileID();
+        if (!Objects.isNull(fileID))
         {
-            String fileID = user.getFileID();
-            if (!Objects.isNull(fileID))
-            {
-                GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(fileID)));
-                if (!Objects.isNull(file))
-                {
-                    byte[] fileBytes = IOUtils.toByteArray(operations.getResource(file).getInputStream());
-                    OutputStream out = new FileOutputStream(ff);
-                    out.write(fileBytes);
-                    out.close();
-                }
-            }
+            GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(fileID)));
+            assertNotNull(file);
+            assertEquals(file.getFilename(), "team4.jpg");
         }
     }
     
