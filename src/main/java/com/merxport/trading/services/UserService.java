@@ -21,7 +21,7 @@ public interface UserService
     
     void sendMessage();
     
-    boolean verifyAccount(String id);
+    User verifyAccount(String id);
     
     // List<Commodity> searchCommodity();
     // List<RFQ> searchRFQ();

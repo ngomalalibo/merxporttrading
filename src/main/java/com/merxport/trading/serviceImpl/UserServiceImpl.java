@@ -128,9 +128,28 @@ public class UserServiceImpl implements UserService
     }
     
     @Override
-    public boolean verifyAccount(String id)
+    public User verifyAccount(String id)
     {
-        return false;
+        User user = userRepository.findById(id).orElse(null);
+        if (!Objects.isNull(user))
+        {
+            Query q = new Query(Criteria.where("_id").is(id));
+            Update update = new Update();
+            update.set("isVerified", true);
+            UpdateResult updateResult = mongoTemplate.updateFirst(q, update, User.class);
+            if (updateResult.wasAcknowledged())
+            {
+                return user;
+            }
+            else
+            {
+                throw new CustomNullPointerException("User not deleted");
+            }
+        }
+        else
+        {
+            throw new CustomNullPointerException("Uer not found");
+        }
     }
     
     @Override
