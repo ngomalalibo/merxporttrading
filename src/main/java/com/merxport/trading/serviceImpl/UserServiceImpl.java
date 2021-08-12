@@ -92,12 +92,11 @@ public class UserServiceImpl implements UserService
     
     @Loggable
     @Override
-    public User deleteUser(String id) throws IOException
+    public User deleteUser(User user)
     {
-        User user = userRepository.findById(id).orElse(null);
         if (!Objects.isNull(user))
         {
-            Query q = new Query(Criteria.where("_id").is(id));
+            Query q = new Query(Criteria.where("_id").is(user.getId()));
             Update update = new Update();
             update.set("isActive", false);
             UpdateResult updateResult = mongoTemplate.updateFirst(q, update, User.class);
@@ -115,7 +114,7 @@ public class UserServiceImpl implements UserService
         }
         else
         {
-            throw new EntityNotFoundException("User not found with ID: " + id);
+            throw new EntityNotFoundException("User not found");
         }
     }
     
