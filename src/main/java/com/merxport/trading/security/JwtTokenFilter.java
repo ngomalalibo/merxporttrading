@@ -34,7 +34,7 @@ public class JwtTokenFilter extends OncePerRequestFilter
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException
     {
         String requestURI = request.getRequestURI();
-        if ("/user".equals(requestURI) || "/upload".equals(requestURI) || "/auth".equals(requestURI) || requestURI.startsWith("/user/verify"))
+        if ("/user".equals(requestURI) || "/upload".equals(requestURI) || "/auth".equals(requestURI) || requestURI.startsWith("/user/verify") || requestURI.contains("/test"))
         {
             log.info("Excluding {} from filter", requestURI);
             return true;
