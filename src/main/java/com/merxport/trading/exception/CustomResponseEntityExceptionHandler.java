@@ -193,7 +193,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     {
         String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(
-                HttpStatus.FORBIDDEN, message, "Provide valid key/token");
+                HttpStatus.FORBIDDEN, message, "Provide valid code/token");
         System.out.println(message);
         return buildResponseEntity(apiResponse, HttpStatus.FORBIDDEN);
     }
@@ -203,7 +203,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     {
         String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(
-                HttpStatus.BAD_REQUEST, message, "Provide valid key/token");
+                HttpStatus.BAD_REQUEST, message, "Provide valid code/token");
         System.out.println(message);
         return buildResponseEntity(apiResponse, HttpStatus.BAD_REQUEST);
     }

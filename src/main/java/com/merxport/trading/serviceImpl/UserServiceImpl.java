@@ -288,7 +288,7 @@ public class UserServiceImpl implements UserService
         }
         else
         {
-            throw new CustomNullPointerException("Uer not found");
+            throw new CustomNullPointerException("User not found");
         }
     }
     
@@ -354,7 +354,7 @@ public class UserServiceImpl implements UserService
         }
         else
         {
-            throw new CustomNullPointerException("Uer not found");
+            throw new CustomNullPointerException("User not found");
         }
     }*/
     
