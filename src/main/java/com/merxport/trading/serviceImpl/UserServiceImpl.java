@@ -216,7 +216,7 @@ public class UserServiceImpl implements UserService
         SecurityContextHolder.getContext().setAuthentication(authentication);
         
         Gson gson = new Gson();
-        System.out.println("Auth User: " + gson.toJson(login));
+        // System.out.println("Auth User: " + gson.toJson(login));
         return login;
     }
     

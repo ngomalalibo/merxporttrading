@@ -24,6 +24,23 @@ public class JwtTokenFilter extends OncePerRequestFilter
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     
+    public static final String[] FILTER_WHITELIST = {
+            // -- Swagger UI v2
+            "/", "/user", "/auth", "/test/", "/upload", "/user/verify/",
+            "/api-docs",
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars",
+            // -- Swagger UI v3 (OpenAPI)
+            "/v3/api-docs",
+            "/swagger-ui"
+            // other public endpoints of your API may be appended to this array
+    };
+    
     @Qualifier("getObjectMapper")
     @Autowired
     ObjectMapper objectMapper;
@@ -34,11 +51,13 @@ public class JwtTokenFilter extends OncePerRequestFilter
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException
     {
         String requestURI = request.getRequestURI();
-        if ("/user".equals(requestURI) || "/upload".equals(requestURI) || "/auth".equals(requestURI) || requestURI.startsWith("/user/verify") || requestURI.contains("/test"))
+        for (String uri : FILTER_WHITELIST)
         {
-            log.info("Excluding {} from filter", requestURI);
-            return true;
-            
+            if (requestURI.startsWith(uri))
+            {
+                log.info("Excluding {} from filter", requestURI);
+                return true;
+            }
         }
         return false;
     }

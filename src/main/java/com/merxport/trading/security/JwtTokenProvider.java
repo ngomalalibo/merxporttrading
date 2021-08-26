@@ -57,8 +57,8 @@ public class JwtTokenProvider
     public Authentication getAuthentication(String token, HttpServletRequest req)
     {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUsername(token));
-        log.info("Username {}", userDetails.getUsername());
-        log.info("Password {}", userDetails.getPassword());
+        // log.info("Username {}", userDetails.getUsername());
+        // log.info("Password {}", userDetails.getPassword());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
         return usernamePasswordAuthenticationToken;
