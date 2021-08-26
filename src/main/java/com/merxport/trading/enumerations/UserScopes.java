@@ -5,9 +5,6 @@ import lombok.Getter;
 @Getter
 public enum UserScopes
 {
-    /**
-     * Package Tracking statuses are captured using this enumeration
-     */
     DOMESTIC("Domestic"), INTERNATIONAL("International");
     
     public static String getDisplayText(UserScopes i)
@@ -15,9 +12,9 @@ public enum UserScopes
         switch (i)
         {
             case DOMESTIC:
-                return "Picked Up";
+                return "Domestic";
             case INTERNATIONAL:
-                return "In Transit";
+                return "International";
             default:
                 return "";
         }

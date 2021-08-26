@@ -4,17 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serializable;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address implements Serializable
+@Document(collection = "units")
+public class Unit extends PersistingBaseEntity
 {
-    private String street;
-    private String city;
-    private String state;
-    private String country;
+    private String name;
 }

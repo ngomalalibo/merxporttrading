@@ -2,17 +2,20 @@ package com.merxport.trading.serviceImpl;
 
 import com.merxport.trading.entities.Address;
 import com.merxport.trading.entities.User;
+import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.UserScopes;
 import com.merxport.trading.services.UserService;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,22 +26,44 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @AutoConfigureMockMvc
 @SpringBootTest
+// @TestPropertySource(locations = "classpath:application.properties")
 class UserServiceImplTest
 {
     @Autowired
-    UserService userService;
+    private UserService userService;
     
     @Autowired
     private GridFsTemplate gridFsTemplate;
     
-    @Autowired
-    private GridFsOperations operations;
+    // @MockBean
+    // private UserRepository userRepository;
+    
+    // @Autowired
+    // private GridFsOperations operations;
+    
+    @TestConfiguration
+    static class EmployeeServiceImplTestContextConfiguration
+    {
+        @Bean
+        public UserService userService()
+        {
+            return new UserServiceImpl()
+            {
+                public User save()
+                {
+                    return null; // return dummy data
+                }
+            };
+        }
+    }
     
     @Test
     void save() throws IOException
@@ -48,34 +73,41 @@ class UserServiceImplTest
         FileInputStream input = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("image.jpg", file.getName(), Files.probeContentType(file.toPath()), IOUtils.toByteArray(input));
         
+        String imageID = userService.upload(multipartFile);
+        
         Address address = new Address("street", "city", "state", "country");
         
-        User user = new User("firstName", "lastName", "middleName", "test@emial.com", "password", "08974938292", Collections.singletonList(address), false, UserScopes.DOMESTIC, null, true);
-        User saved = userService.save(user, multipartFile);
+        User user = new User("firstName", "lastName", "middleName", "test@email.com", "password", "08974938292", Collections.singletonList(address), false, UserScopes.DOMESTIC, imageID, List.of(UserRole.BUYER, UserRole.BUYER), null, null, null, null, null, null, false, null);
+        User saved = userService.save(user);
         assertEquals(saved.getFirstName(), user.getFirstName());
-        assertEquals(saved.getFileID(), user.getFileID());
+        assertEquals(saved.getImageID(), user.getImageID());
     }
     
     @Test
     void deleteUser() throws IOException
     {
-        String id = "6115658f6cdc51682a71a084";
-        User user = userService.deleteUser(id);
+        String id = "6122e74dcdab19483bdce58a";
+        User user = userService.deleteUser(userService.findUser(id));
         
+        System.out.println("Test Method: " + user.isActive());
+        System.out.println("Arch Date: " + user.getAudit().getArchivedDate());
+        System.out.println("Arch By: " + user.getAudit().getArchivedBy());
+        System.out.println("Mod Date: " + user.getAudit().getModifiedDate());
+        System.out.println("Mod By: " + user.getAudit().getModifiedBy());
         assertFalse(user.isActive());
+        assertNotNull(user.getAudit().getArchivedDate());
+        assertNotNull(user.getAudit().getArchivedBy());
     }
     
     @Test
     void findUser() throws IOException
     {
-        String id = "6115658f6cdc51682a71a084";
+        String id = "61243ad97c55ab534bcaeddb";
         User user = userService.findUser(id);
         
         assertNotNull(user);
         
-        File ff = new File("C:/imageGet/team3.jpg");
-        
-        String fileID = user.getFileID();
+        String fileID = user.getImageID();
         if (!Objects.isNull(fileID))
         {
             GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(fileID)));

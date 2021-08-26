@@ -14,4 +14,6 @@ public interface UserRepository extends MongoRepository<User, String>
 {
     @Query("{'isActive':?0}")
     Optional<List<User>> findUsers(boolean isActive, Sort sort);
+    
+    User findByEmail(String email);
 }
