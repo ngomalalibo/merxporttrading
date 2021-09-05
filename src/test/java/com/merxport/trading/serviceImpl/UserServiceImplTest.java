@@ -3,7 +3,8 @@ package com.merxport.trading.serviceImpl;
 import com.merxport.trading.entities.Address;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserRole;
-import com.merxport.trading.enumerations.UserScopes;
+import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserType;
 import com.merxport.trading.services.UserService;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +78,7 @@ class UserServiceImplTest
         
         Address address = new Address("street", "city", "state", "country");
         
-        User user = new User("firstName", "lastName", "middleName", "test@email.com", "password", "08974938292", Collections.singletonList(address), false, UserScopes.DOMESTIC, imageID, List.of(UserRole.BUYER, UserRole.BUYER), null, null, null, null, null, null, false, null);
+        User user = new User("firstName", "lastName", "middleName", "test@email.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID, List.of(UserRole.BUYER, UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
         User saved = userService.save(user);
         assertEquals(saved.getFirstName(), user.getFirstName());
         assertEquals(saved.getImageID(), user.getImageID());
@@ -102,7 +103,7 @@ class UserServiceImplTest
     @Test
     void findUser() throws IOException
     {
-        String id = "61243ad97c55ab534bcaeddb";
+        String id = "6126806273aade16270429c4";
         User user = userService.findUser(id);
         
         assertNotNull(user);

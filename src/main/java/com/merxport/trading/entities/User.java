@@ -2,7 +2,8 @@ package com.merxport.trading.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.merxport.trading.enumerations.UserRole;
-import com.merxport.trading.enumerations.UserScopes;
+import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserType;
 import com.merxport.trading.security.VerificationPOJO;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,7 +37,7 @@ public class User extends PersistingBaseEntity
     private String phoneNo;
     private List<Address> address = new ArrayList<>();
     private boolean isVerified;
-    private UserScopes scope;
+    private Scopes scope;
     private String imageID;
     private List<UserRole> userRoles = new ArrayList<>();
     private String token;
@@ -47,4 +48,5 @@ public class User extends PersistingBaseEntity
     private String businessRegNo;
     private boolean hasExportLicense;
     private String exportLicenseID;
+    private UserType userType;
 }

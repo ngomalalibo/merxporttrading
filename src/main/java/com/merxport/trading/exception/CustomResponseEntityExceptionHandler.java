@@ -13,6 +13,7 @@ import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -47,7 +48,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
         }
         
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.BAD_REQUEST, message, errors);
         System.out.println(message);
@@ -58,7 +59,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.NOT_FOUND, message, ex.getMessage());
         System.out.println(message);
@@ -69,7 +70,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     protected ResponseEntity<Object> handleNullPointerExceptionInternal(
             NullPointerException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.NOT_FOUND, message, ex.getMessage());
         System.out.println(message);
@@ -80,7 +81,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     protected ResponseEntity<Object> handleIOExceptionInternal(
             IOException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.NOT_FOUND, message, ex.getMessage());
         System.out.println(message);
@@ -91,7 +92,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     protected ResponseEntity<Object> handleCustomNullPointerExceptionInternal(
             CustomNullPointerException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.NOT_FOUND, message, ex.getMessage());
         System.out.println(message);
@@ -102,7 +103,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     protected ResponseEntity<Object> handleNonUniqueResultExceptionInternal(
             NonUniqueResultException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.NOT_ACCEPTABLE, message, ex.getMessage());
         System.out.println(message);
@@ -120,7 +121,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
                                violation.getPropertyPath() + ": " + violation.getMessage());
         }
         
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.BAD_REQUEST, message, ex.getMessage() + " " + errors);
         System.out.println(message);
@@ -134,7 +135,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         String error =
                 ex.getName() + " should be of type " + ex.getRequiredType().getName();
         
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.BAD_REQUEST, message, error);
         System.out.println(message);
@@ -154,7 +155,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
                 " method is not supported for this request. Supported methods are ");
         ex.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
         
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(HttpStatus.METHOD_NOT_ALLOWED,
                                                     message, builder.toString());
         System.out.println(message);
@@ -166,7 +167,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
             MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request)
     {
         String template = "Missing parameter:  %s. Missing parameter: %s";
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.BAD_REQUEST, message, String.format(template, ex.getMessage(), ex.getParameter()));
         System.out.println(message);
@@ -181,7 +182,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     {
         String error = ex.getParameterName() + " parameter is missing";
         
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse =
                 new ApiException(HttpStatus.BAD_REQUEST, message, error);
         System.out.println(message);
@@ -191,7 +192,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(
                 HttpStatus.FORBIDDEN, message, "Provide valid code/token");
         System.out.println(message);
@@ -201,9 +202,20 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler({RequestRejectedException.class})
     public ResponseEntity<Object> handleRequestRejected(RequestRejectedException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(
                 HttpStatus.BAD_REQUEST, message, "Provide valid code/token");
+        System.out.println(message);
+        return buildResponseEntity(apiResponse, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler({DuplicateEntityException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleDuplicateEntity(DuplicateEntityException ex)
+    {
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
+        ApiException apiResponse = new ApiException(
+                HttpStatus.BAD_REQUEST, message, "Duplicate Entry");
         System.out.println(message);
         return buildResponseEntity(apiResponse, HttpStatus.BAD_REQUEST);
     }
@@ -211,7 +223,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler({HttpServerErrorException.class})
     public ResponseEntity<Object> handleHttpServerError(HttpServerErrorException ex)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage() + " " + ex.getMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage() + " " + ex.getMessage();
         ApiException apiResponse = new ApiException(
                 HttpStatus.INTERNAL_SERVER_ERROR, message, "HttpServer Error");
         System.out.println(message);
@@ -222,7 +234,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request)
     {
-        String message = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(
                 HttpStatus.INTERNAL_SERVER_ERROR, message, "error occurred");
         System.out.println(message);

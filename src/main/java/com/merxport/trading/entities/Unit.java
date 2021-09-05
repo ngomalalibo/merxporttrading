@@ -13,5 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "units")
 public class Unit extends PersistingBaseEntity
 {
-    private String name;
+    private String singularName;
+    private String pluralName;
 }

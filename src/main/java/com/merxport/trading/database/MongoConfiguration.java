@@ -1,6 +1,6 @@
 package com.merxport.trading.database;
 
-import com.merxport.trading.codecs.UserScopesCodec;
+import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.User;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
 @Slf4j
 @Getter
 @Configuration
@@ -43,12 +45,14 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration
     private final String DBNAME = "merxporttrading";
     private final String DB_ORGANIZATION = "Merxport Commodities Trading.";
     private final String DB_USER = "user";
+    private final String DB_COMMODITIES = "commodities";
     private MongoClient mongo = null;
     private MongoDatabase db = null;
     private MongoCollection<User> users;
+    private MongoCollection<Commodity> commodity;
     
     
-    private String DBSTR = System.getenv().get("MERXPORTDBURL");
+    private String DBSTR = String.format(System.getenv().get("MERXPORTDBURL"), 1, "majority"); // write and read concerns are adjustable
     private HashSet<String> cols = new HashSet<>();
     
     @Override
@@ -64,9 +68,8 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration
     }
     
     @Bean
-    public GridFsTemplate gridFsTemplate() throws ClassNotFoundException
+    public GridFsTemplate gridFsTemplate()
     {
-        // return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter(mongoDbFactory(), customConversions(), mongoMappingContext(customConversions())));
         return new GridFsTemplate(mongoDbFactory(), mongoConverter);
     }
     
@@ -75,13 +78,9 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration
     public MongoClient mongoClient()
     {
         final CodecRegistry defaultCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
-        final CodecProvider pojoCodecProvider = PojoCodecProvider.builder()
-                                                                 .register("com.merxport.trading.entities", "com.trading.enumerations").automatic(true).build();
+        final CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
         final CodecRegistry cvePojoCodecRegistry = CodecRegistries.fromProviders(pojoCodecProvider);
-        final CodecRegistry customEnumCodecs = CodecRegistries.fromCodecs(new UserScopesCodec());
-        
-        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, customEnumCodecs, cvePojoCodecRegistry);
-        
+        CodecRegistry codecRegistry = fromRegistries(defaultCodecRegistry, cvePojoCodecRegistry);
         ConnectionString connectionString = new ConnectionString(DBSTR);
         
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -98,6 +97,7 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration
         }
         
         users = db.getCollection(DB_USER, User.class).withCodecRegistry(codecRegistry);
+        commodity = db.getCollection(DB_COMMODITIES, Commodity.class).withCodecRegistry(codecRegistry);
         
         
         return mongo;

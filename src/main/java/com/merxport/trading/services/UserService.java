@@ -2,7 +2,7 @@ package com.merxport.trading.services;
 
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserRole;
-import com.merxport.trading.enumerations.UserScopes;
+import com.merxport.trading.enumerations.Scopes;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public interface UserService
     
     // List<Commodity> searchCommodity();
     // List<RFQ> searchRFQ();
-    void setScope(UserScopes scope);
+    void setScope(Scopes scope);
     
     User authenticateUser(String username, String password, HttpServletRequest request) throws Exception;
     

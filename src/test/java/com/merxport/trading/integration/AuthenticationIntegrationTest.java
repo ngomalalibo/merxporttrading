@@ -5,7 +5,9 @@ import com.merxport.trading.config.GenerateVerificationCode;
 import com.merxport.trading.entities.Address;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserRole;
-import com.merxport.trading.enumerations.UserScopes;
+import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserType;
+import com.merxport.trading.exception.DuplicateEntityException;
 import com.merxport.trading.security.AuthenticationRequest;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -67,7 +69,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
         ResponseEntity<String> imageID = restTemplate.postForEntity("/upload", body, String.class /*, typeReference*/);
         Address address = new Address("street", "city", "state", "country");
         
-        User user = new User("Ngo", "Alalibo", "Martin", "ngomalalibo1@gmail.com", "password", "08974938292", Collections.singletonList(address), false, UserScopes.DOMESTIC, imageID.getBody(), List.of(UserRole.BUYER), null, null, null, null, null, null, false, null);
+        User user = new User("Ngo", "Alalibo", "Martin", "ngomalalibo1@gmail.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID.getBody(), List.of(UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
         
         ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("/user", user, User.class);
         Assert.assertEquals(201, userResponseEntity.getStatusCode().value());

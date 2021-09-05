@@ -16,7 +16,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@OpenAPIDefinition(info = @Info(title = "Merxport Commodities API Documentation",
+@OpenAPIDefinition(info = @Info(title = "Merxport Trading API Documentation",
         version = "v0.0.1",
         description = "Better business and better service.",
         license = @io.swagger.v3.oas.annotations.info.License(name = "Merxport Commodities",

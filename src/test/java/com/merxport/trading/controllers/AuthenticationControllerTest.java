@@ -2,7 +2,9 @@ package com.merxport.trading.controllers;
 
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserRole;
+import com.merxport.trading.exception.DuplicateEntityException;
 import com.merxport.trading.security.AuthenticationRequest;
+import com.merxport.trading.security.VerificationPOJO;
 import com.merxport.trading.services.UserService;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
@@ -10,8 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,13 +36,17 @@ class AuthenticationControllerTest extends AbstractControllerTest
         Assertions.assertThat(authenticationController).isNotNull();
     }
     
+    @org.junit.Test(expected = DuplicateEntityException.class)
     @Test
     void addUser() throws Exception
     {
-        User save = userService.save(new User());
+        User user = User.builder().firstName("Ngo").lastName("Alalibo").email("ngomalalibo@gmail.com").password("password")
+                                 .isVerified(true).verificationPOJO(new VerificationPOJO("123456", LocalDateTime.now())).userRoles(List.of(UserRole.BUYER, UserRole.SELLER)).build();
+        User save = userService.save(user);
         mockMvc.perform(MockMvcRequestBuilders.post("/user").contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(save)))
                .andExpect(status().isCreated())
                .andExpect(jsonPath("$.firstName").value("TestFName"))
+               .andExpect(result -> assertTrue(result.getResolvedException() instanceof DuplicateEntityException))
                .andExpect(jsonPath("$.lastName").value("testlastName"));
     }
     
@@ -52,11 +63,12 @@ class AuthenticationControllerTest extends AbstractControllerTest
     @Test
     void login() throws Exception
     {
-        AuthenticationRequest rew = new AuthenticationRequest();
-        mockMvc.perform(MockMvcRequestBuilders.post("/authenticate").contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(rew)))
+        // fname pass
+        AuthenticationRequest rew = new AuthenticationRequest("ugochukwu@qa.team", "Ugochukwu_1");
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth").contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(rew)))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.firstName").value("fname"))
-               .andExpect(jsonPath("$.password").value("pass"));
+               .andExpect(jsonPath("$.firstName").value("Ugochukwu"))
+               .andExpect(jsonPath("$.password").value("$2a$11$uXztwExxbtQ3.rteb2qxZuuu8LQ2t9FB3U19OnmAUf0z8CZCUpYxa"));
     }
     
     @Test

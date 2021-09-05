@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Component
 public class DeleteServiceImpl
 {
     public <T extends PersistingBaseEntity> T deleteEntity(T t, MongoTemplate mongoTemplate, MongoRepository<T, String> mongoRepository)
@@ -30,8 +29,8 @@ public class DeleteServiceImpl
             update.set("audit.archivedDate", now);
             update.set("audit.modifiedBy", t.getAudit().getModifiedBy());
             update.set("audit.modifiedDate", t.getAudit().getModifiedDate());
-            UpdateResult updateResult = mongoTemplate.updateFirst(q, update, User.class);
-            if (updateResult.wasAcknowledged())
+            UpdateResult updateResult = mongoTemplate.updateFirst(q, update, t.getClass());
+            if (updateResult.wasAcknowledged() && updateResult.getMatchedCount() == 1)
             {
                 t = mongoRepository.findById(t.getId()).orElse(null);
                 assert t != null;

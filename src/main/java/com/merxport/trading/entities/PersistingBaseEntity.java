@@ -6,7 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -22,12 +25,14 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
 @Component
+@BsonDiscriminator
 public class PersistingBaseEntity implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
     @BsonProperty("_id")
     @JsonProperty("_id")
+    @Field(targetType = FieldType.OBJECT_ID)
     private String id;
     private Audit audit = new Audit();
     private boolean isActive = true;

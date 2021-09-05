@@ -7,7 +7,7 @@ import com.merxport.trading.config.GenerateVerificationCode;
 import com.merxport.trading.email.SendMail_Working;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserRole;
-import com.merxport.trading.enumerations.UserScopes;
+import com.merxport.trading.enumerations.Scopes;
 import com.merxport.trading.exception.CustomNullPointerException;
 import com.merxport.trading.exception.DuplicateEntityException;
 import com.merxport.trading.exception.EntityNotFoundException;
@@ -359,7 +359,7 @@ public class UserServiceImpl implements UserService
     }*/
     
     @Override
-    public void setScope(UserScopes scope)
+    public void setScope(Scopes scope)
     {
     
     }

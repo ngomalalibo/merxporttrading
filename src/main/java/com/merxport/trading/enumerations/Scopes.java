@@ -3,11 +3,11 @@ package com.merxport.trading.enumerations;
 import lombok.Getter;
 
 @Getter
-public enum UserScopes
+public enum Scopes
 {
     DOMESTIC("Domestic"), INTERNATIONAL("International");
     
-    public static String getDisplayText(UserScopes i)
+    public static String getDisplayText(Scopes i)
     {
         switch (i)
         {
@@ -22,16 +22,16 @@ public enum UserScopes
     
     private String value;
     
-    UserScopes(String value)
+    Scopes(String value)
     {
         this.value = value;
     }
     
-    public static UserScopes fromValue(String v)
+    public static Scopes fromValue(String v)
     {
-        for (UserScopes c : UserScopes.values())
+        for (Scopes c : Scopes.values())
         {
-            if (c.value.equals(v))
+            if (c.value.equalsIgnoreCase(v) || c.name().equalsIgnoreCase(v))
             {
                 return c;
             }

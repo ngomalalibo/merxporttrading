@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface UnitRepository extends MongoRepository<Unit, String>
 {
-    List<Unit> findByNameLikeOrderByNameAsc(String name);
+    List<Unit> findBySingularNameLikeOrderBySingularNameAsc(String singularName);
 }

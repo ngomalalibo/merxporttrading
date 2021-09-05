@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -17,13 +18,13 @@ public class UnitController
     private UnitRepository unitRepository;
     
     @PostMapping("/unit")
-    public ResponseEntity<Unit> addUnit(@RequestBody Unit unit)
+    public ResponseEntity<Unit> addUnit(@RequestBody Unit unit, @RequestParam("token") String token) throws IOException
     {
         return ResponseEntity.ok(unitRepository.save(unit));
     }
     
     @GetMapping("/unit/{id}")
-    public ResponseEntity<Unit> getUnit(@PathVariable String id)
+    public ResponseEntity<Unit> getUnit(@PathVariable String id, @RequestParam("token") String token) throws IOException
     {
         return ResponseEntity.ok(unitRepository.findById(id).orElseThrow(() ->
                                                                          {
@@ -32,20 +33,20 @@ public class UnitController
     }
     
     @GetMapping("/units/{name}")
-    public ResponseEntity<List<Unit>> getUnits(@PathVariable(required = false) String name)
+    public ResponseEntity<List<Unit>> getUnits(@PathVariable(required = false) String name, @RequestParam("token") String token) throws IOException
     {
         name = (name == null ? "" : name);
-        return ResponseEntity.ok(unitRepository.findByNameLikeOrderByNameAsc(name));
+        return ResponseEntity.ok(unitRepository.findBySingularNameLikeOrderBySingularNameAsc(name));
     }
     
     @DeleteMapping("/unit/{id}")
-    public void deleteUnit(@PathVariable String id)
+    public void deleteUnit(@PathVariable String id, @RequestParam("token") String token) throws IOException
     {
         unitRepository.deleteById(id);
     }
     
     @PutMapping("/unit")
-    public ResponseEntity<Unit> updateUnit(@RequestBody Unit unit)
+    public ResponseEntity<Unit> updateUnit(@RequestBody Unit unit, @RequestParam("token") String token) throws IOException
     {
         return ResponseEntity.ok(unitRepository.save(unit));
     }

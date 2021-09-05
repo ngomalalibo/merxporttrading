@@ -3,18 +3,20 @@ package com.merxport.trading.enumerations;
 import lombok.Getter;
 
 @Getter
-public enum UserType
+public enum RFQPriority
 {
-    PERSONAL("Personal"), BUSINESS("Business");
+    LOW("Low"), MEDIUM("Medium"), HIGH("High");
     
-    public static String getDisplayText(UserType i)
+    public static String getDisplayText(RFQPriority i)
     {
         switch (i)
         {
-            case PERSONAL:
-                return "Personal";
-            case BUSINESS:
-                return "Business";
+            case LOW:
+                return "Low";
+            case MEDIUM:
+                return "Medium";
+            case HIGH:
+                return "High";
             default:
                 return "";
         }
@@ -22,14 +24,14 @@ public enum UserType
     
     private String value;
     
-    UserType(String value)
+    RFQPriority(String value)
     {
         this.value = value;
     }
     
-    public static UserType fromValue(String v)
+    public static RFQPriority fromValue(String v)
     {
-        for (UserType c : UserType.values())
+        for (RFQPriority c : RFQPriority.values())
         {
             if (c.value.equalsIgnoreCase(v) || c.name().equalsIgnoreCase(v))
             {
