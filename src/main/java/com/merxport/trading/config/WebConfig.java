@@ -2,6 +2,7 @@ package com.merxport.trading.config;
 
 import com.merxport.trading.email.SendMail_Working;
 import com.merxport.trading.serviceImpl.DeleteServiceImpl;
+import com.merxport.trading.serviceImpl.FindServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -33,5 +34,11 @@ public class WebConfig extends WebMvcConfigurationSupport
     public DeleteServiceImpl deleteService()
     {
         return new DeleteServiceImpl();
+    }
+    
+    @Bean
+    public FindServiceImpl findService()
+    {
+        return new FindServiceImpl();
     }
 }

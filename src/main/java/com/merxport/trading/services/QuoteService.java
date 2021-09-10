@@ -3,8 +3,7 @@ package com.merxport.trading.services;
 import com.merxport.trading.entities.Quote;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.enumerations.QuoteStatus;
-
-import java.util.List;
+import com.merxport.trading.response.PageableResponse;
 
 public interface QuoteService
 {
@@ -12,13 +11,13 @@ public interface QuoteService
     
     Quote delete(Quote c);
     
-    List<Quote> findQuoteByRFQ(RFQ rfq);
+    PageableResponse findQuoteByRFQ(RFQ rfq, int page, int pageSize);
     
     Quote updateQuoteStatus(Quote quote, QuoteStatus quoteStatus);
     
-    List<Quote> findQuoteByStatusAndSeller(String sellerID, QuoteStatus quoteStatus);
+    PageableResponse findQuoteByStatusAndSeller(String sellerID, QuoteStatus quoteStatus, int page, int pageSize);
     
-    List<Quote> findAllQuotesBySeller(String sellerID);
+    PageableResponse findAllQuotesBySeller(String sellerID, int page, int pageSize);
     
-    List<Quote> findAllActive();
+    PageableResponse findAllActive(int page, int pageSize);
 }

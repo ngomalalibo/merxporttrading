@@ -2,12 +2,10 @@ package com.merxport.trading.entities;
 
 import com.merxport.trading.enumerations.CommercialTerms;
 import com.merxport.trading.enumerations.RFQPriority;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Currency;
@@ -17,9 +15,11 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Document(collection = "rfqs")
 public class RFQ extends PersistingBaseEntity
 {
+    @NotBlank(message = "Title is mandatory")
     private String title;
     private Commodity commodity;
     private BigDecimal rate;

@@ -65,10 +65,10 @@ public class SendMail_Working
     
     public boolean sendMailSSL(ActionableEmail actionableEmail)
     {
-        System.out.println("Gmail Password: " + password);
-        System.out.println("Gmail Username: " + username);
-        System.out.println("Gmail To: " + actionableEmail.getToAddresses());
-        System.out.println("Token: " + template.substring(1, 50));
+        // System.out.println("Gmail Password: " + password);
+        // System.out.println("Gmail Username: " + username);
+        // System.out.println("Gmail To: " + actionableEmail.getToAddresses());
+        // System.out.println("Token: " + template.substring(1, 50));
         Properties properties = System.getProperties();
         properties.put("mail.smtp.host", host);
         properties.put("mail.smtp.port", "465");
@@ -94,7 +94,10 @@ public class SendMail_Working
             InternetAddress internetAddress = new InternetAddress(username != null ? username : "weblibrarianapp@gmail.com");
             internetAddress.setPersonal("Merxport Trading");
             message.setFrom(internetAddress);
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", Arrays.asList(username != null ? username : "weblibrarianapp@gmail.com", actionableEmail.getToAddresses()))));
+            List<String> toAddresses = Arrays.asList(username != null ? username : "weblibrarianapp@gmail.com", actionableEmail.getToAddresses());
+            System.out.print("To addresses: ");
+            toAddresses.forEach(System.out::println);
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(", ", toAddresses)));
             message.setSubject(actionableEmail.getSubject());
             message.setSentDate(new Date());
             message.setContent(actionableEmail.getMessage(), "text/html");

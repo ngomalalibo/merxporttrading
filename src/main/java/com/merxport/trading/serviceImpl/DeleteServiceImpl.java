@@ -1,7 +1,6 @@
 package com.merxport.trading.serviceImpl;
 
 import com.merxport.trading.entities.PersistingBaseEntity;
-import com.merxport.trading.entities.User;
 import com.merxport.trading.exception.CustomNullPointerException;
 import com.merxport.trading.exception.EntityNotFoundException;
 import com.mongodb.client.result.UpdateResult;
@@ -10,7 +9,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,7 +23,7 @@ public class DeleteServiceImpl
             Query q = new Query(Criteria.where("_id").is(t.getId()));
             Update update = new Update();
             update.set("isActive", false);
-            update.set("audit.archivedBy", "System");
+            update.set("audit.archivedBy", t.getSessionUser());
             update.set("audit.archivedDate", now);
             update.set("audit.modifiedBy", t.getAudit().getModifiedBy());
             update.set("audit.modifiedDate", t.getAudit().getModifiedDate());
@@ -35,9 +33,9 @@ public class DeleteServiceImpl
                 t = mongoRepository.findById(t.getId()).orElse(null);
                 assert t != null;
                 t.getAudit().setArchivedDate(now);
-                t.getAudit().setArchivedBy("System");
+                t.getAudit().setArchivedBy(t.getSessionUser());
                 t.getAudit().setModifiedDate(now);
-                t.getAudit().setModifiedBy("System");
+                t.getAudit().setModifiedBy(t.getSessionUser());
                 return t;
             }
             else

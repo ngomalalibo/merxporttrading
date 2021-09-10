@@ -35,6 +35,7 @@ import java.util.List;
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler
 {
     @Override
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request)
     {
@@ -210,7 +211,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
     
     @ExceptionHandler({DuplicateEntityException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleDuplicateEntity(DuplicateEntityException ex)
     {
         String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();

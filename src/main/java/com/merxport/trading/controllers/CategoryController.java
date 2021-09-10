@@ -3,10 +3,14 @@ package com.merxport.trading.controllers;
 import com.merxport.trading.entities.CommodityCategory;
 import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.repositories.CategoryRepository;
+import com.merxport.trading.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -16,9 +20,16 @@ public class CategoryController
     @Autowired
     private CategoryRepository categoryRepository;
     
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    
+    @Value("${pagination.page-size}")
+    private int pageSize;
+    
     @PostMapping("/category")
-    public ResponseEntity<CommodityCategory> addCategory(@RequestBody CommodityCategory commodityCategory, @RequestParam("token") String token)
+    public ResponseEntity<CommodityCategory> addCategory(@Valid @RequestBody CommodityCategory commodityCategory, @RequestParam("token") String token)
     {
+        commodityCategory.setSessionUser(jwtTokenProvider.getUsername(token));
         return ResponseEntity.ok(categoryRepository.save(commodityCategory));
     }
     
@@ -32,10 +43,10 @@ public class CategoryController
     }
     
     @GetMapping("/categories/{name}")
-    public ResponseEntity<List<CommodityCategory>> getCategories(@PathVariable(required = false) String name, @RequestParam("token") String token)
+    public ResponseEntity<List<CommodityCategory>> getCategories(@PathVariable(required = false) String name, @RequestParam("token") String token, @RequestParam("page")int page)
     {
         name = (name == null ? "" : name);
-        return ResponseEntity.ok(categoryRepository.findByNameLikeOrderByNameAsc(name));
+        return ResponseEntity.ok(categoryRepository.findByNameLikeOrderByNameAsc(name, PageRequest.of(page,  pageSize)));
     }
     
     @DeleteMapping("/category/{id}")
@@ -45,8 +56,9 @@ public class CategoryController
     }
     
     @PutMapping("/category")
-    public ResponseEntity<CommodityCategory> updateCategory(@RequestBody CommodityCategory commodityCategory)
+    public ResponseEntity<CommodityCategory> updateCategory(@RequestBody CommodityCategory commodityCategory, @RequestParam("token") String token)
     {
+        commodityCategory.setSessionUser(jwtTokenProvider.getUsername(token));
         return ResponseEntity.ok(categoryRepository.save(commodityCategory));
     }
 }

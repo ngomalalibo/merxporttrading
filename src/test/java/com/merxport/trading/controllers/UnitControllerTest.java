@@ -21,7 +21,7 @@ class UnitControllerTest extends AbstractIntegrationTest
     @Test
     void addUnit()
     {
-        Unit unit = new Unit("Bag", "Bags");
+        Unit unit = new Unit("Tonne", "Tonnes");
         ResponseEntity<Unit> response = restTemplate.postForEntity("/api/unit?token=" + AuthenticationController.TOKEN, unit, Unit.class);
         Unit savedUnit = response.getBody();
         assertNotNull(savedUnit);

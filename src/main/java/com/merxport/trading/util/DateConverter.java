@@ -29,6 +29,13 @@ public class DateConverter
         return offsetDateTime.toZonedDateTime();
     }
     
+    public static LocalDateTime stringToLocalDateTime(String str)
+    {
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        return LocalDateTime.parse(str, formatter);
+    }
+    
     public static Timestamp millisecToTimestampConv(long milli)
     {
         return new Timestamp(milli);

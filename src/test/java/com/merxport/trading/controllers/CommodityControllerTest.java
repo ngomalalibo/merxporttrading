@@ -1,5 +1,7 @@
 package com.merxport.trading.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
@@ -8,12 +10,14 @@ import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.CommodityRequest;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.UserService;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -21,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
@@ -40,8 +45,21 @@ class CommodityControllerTest extends AbstractIntegrationTest
     
     private Commodity commodity;
     
-    
     private User user;
+    
+    private final ParameterizedTypeReference<PageableResponse> typeReference = new ParameterizedTypeReference<>()
+    {
+    };
+    
+    private final ParameterizedTypeReference<List<Commodity>> paramTypeReference = new ParameterizedTypeReference<>()
+    {
+    };
+    @Qualifier("getObjectMapper")
+    @Autowired
+    private ObjectMapper objectMapper;
+    private TypeReference<List<Commodity>> typeReferenceList = new TypeReference<>()
+    {
+    };
     
     @BeforeEach
     public void setup() throws Exception
@@ -109,18 +127,17 @@ class CommodityControllerTest extends AbstractIntegrationTest
     void getCommoditiesByName()
     {
         // String name = "W";
-        String name = "Sh";
+        String name = "co";
         Map<String, String> uriVars = new HashMap<>()
         {{
             put("name", name);
         }};
-        ResponseEntity<List<Commodity>> body = restTemplate.exchange("/api/commodities/{name}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(body);
-        assertNotNull(body.getBody());
-        assertFalse(body.getBody().stream().map(Commodity::getName).anyMatch(d -> !d.contains(name)));
-        assertEquals(2, body.getBody().size());
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodities/{name}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertFalse(responseBody.stream().map(commodity -> commodity.getName().toLowerCase()).anyMatch(d -> !d.contains(name.toLowerCase())));
+        assertEquals(3, responseBody.size());
     }
     
     @Test
@@ -131,13 +148,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
         {{
             put("search", search);
         }};
-        ResponseEntity<List<Commodity>> body = restTemplate.exchange("/api/{search}/commoditySearch?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(body);
-        assertNotNull(body.getBody());
-        body.getBody().stream().map(Commodity::getName).forEach(System.out::println);
-        assertEquals(2, body.getBody().size());
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{search}/commoditySearch?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        responseBody.stream().map(Commodity::getName).forEach(System.out::println);
+        assertEquals(2, responseBody.size());
     }
     
     @Test
@@ -165,12 +181,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("category", category);
         }};
         
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/{category}/commodityByCategory?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(3, commodities.getBody().size());
-        Assertions.assertEquals("Publishing", commodities.getBody().get(0).getCategory().get(0));
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{category}/commodityByCategory?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(3, responseBody.size());
+        Assertions.assertEquals("Public Safety", responseBody.get(0).getCategory().get(0));
     }
     
     @Test
@@ -182,12 +198,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("country", country);
         }};
         
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/{country}/commodityByCountry?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(1, commodities.getBody().size());
-        Assertions.assertEquals("Iceland", commodities.getBody().get(0).getCountry());
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{country}/commodityByCountry?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(1, responseBody.size());
+        Assertions.assertEquals("Iceland", responseBody.get(0).getCountry());
     }
     
     @Test
@@ -199,12 +215,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("amount", amount);
         }};
         
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/{amount}/commodityGreaterThan?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(6, commodities.getBody().size());
-        Assertions.assertEquals(new BigDecimal(100000), commodities.getBody().get(0).getRate());
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{amount}/commodityGreaterThan?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(6, responseBody.size());
+        Assertions.assertEquals(new BigDecimal(100000), responseBody.get(0).getRate());
     }
     
     @Test
@@ -216,12 +232,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("amount", amount);
         }};
         
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/{amount}/commodityLessThan?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(1, commodities.getBody().size());
-        Assertions.assertEquals(new BigDecimal(30000), commodities.getBody().get(0).getRate());
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{amount}/commodityLessThan?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(1, responseBody.size());
+        Assertions.assertEquals(new BigDecimal(30000), responseBody.get(0).getRate());
     }
     
     @Test
@@ -233,12 +249,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("scope", scope.name());
         }};
         
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/{scope}/commodityByScope?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(7, commodities.getBody().size());
-        Assertions.assertEquals("INTERNATIONAL", commodities.getBody().get(0).getScope().name());
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{scope}/commodityByScope?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null,typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(6, responseBody.size());
+        Assertions.assertEquals("INTERNATIONAL", responseBody.get(0).getScope().name());
     }
     
     @Test
@@ -252,12 +268,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("sellerID", user.getId());
         }};
         
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/{sellerID}/commodityBySeller?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, uriVars);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(7, commodities.getBody().size());
-        assertTrue(commodities.getBody().get(0).getDescription().contains("Descriptio"));
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{sellerID}/commodityBySeller?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(6, responseBody.size());
+        assertTrue(responseBody.get(0).getDescription().contains("Descriptio"));
     }
     
     @Test
@@ -265,11 +281,11 @@ class CommodityControllerTest extends AbstractIntegrationTest
     {
         CommodityRequest cr = new CommodityRequest("Iceland", Scopes.INTERNATIONAL.name(), new BigDecimal(40000), "Services");
         HttpEntity<CommodityRequest> requestEntity = new HttpEntity<>(cr);
-        ResponseEntity<List<Commodity>> commodities = restTemplate.exchange("/api/commodityMultiSearch?token=" + AuthenticationController.TOKEN, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<Commodity>>()
-        {
-        }, cr);
-        assertNotNull(commodities.getBody());
-        Assertions.assertEquals(7, commodities.getBody().size());
-        assertTrue(commodities.getBody().get(0).getDescription().contains("Descriptio"));
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodityMultiSearch?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.POST, requestEntity, typeReference, cr);
+        PageableResponse pageableResponse = body.getBody();
+        assertNotNull(pageableResponse);
+        List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        Assertions.assertEquals(6, responseBody.size());
+        assertTrue(responseBody.get(0).getDescription().contains("Description"));
     }
 }

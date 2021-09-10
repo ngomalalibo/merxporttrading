@@ -50,6 +50,7 @@ public class TradingApplication extends SpringBootServletInitializer
     public ObjectMapper getObjectMapper()
     {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         return objectMapper;
         

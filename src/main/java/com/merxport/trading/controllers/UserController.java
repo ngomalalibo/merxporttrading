@@ -1,7 +1,9 @@
 package com.merxport.trading.controllers;
 
 import com.merxport.trading.entities.User;
+import com.merxport.trading.security.JwtTokenProvider;
 import com.merxport.trading.services.UserService;
+import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,9 @@ public class UserController
 {
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
     
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUser(@PathVariable String id, @RequestParam("token") String token) throws IOException
@@ -32,7 +37,9 @@ public class UserController
     @GetMapping("/user/delete/{id}")// archive user data
     public ResponseEntity<User> deleteUser(@PathVariable String id, @RequestParam("token") String token) throws IOException
     {
-        return ResponseEntity.ok(userService.deleteUser(userService.findUser(id)));
+        User user = userService.findUser(id);
+        user.setSessionUser(jwtTokenProvider.getUsername(token));
+        return ResponseEntity.ok(userService.deleteUser(user));
     }
     
     /*@PutMapping("/user/{email}/addRole")

@@ -13,7 +13,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -52,7 +51,7 @@ public class UserAuthenticationProvider extends DaoAuthenticationProvider
         {
             throw new BadCredentialsException("Invalid username or password.");
         }
-    
+        
         User usere = userRepository.findByEmail(username);
         
         if (usere == null)
@@ -64,6 +63,7 @@ public class UserAuthenticationProvider extends DaoAuthenticationProvider
         {
             System.out.println("Password Matches");
             Set<SimpleGrantedAuthority> authorities = usere.getUserRoles().stream().map(role -> new SimpleGrantedAuthority(role.getValue())).collect(Collectors.toSet());
+            
             return new UsernamePasswordAuthenticationToken(username, password, authorities);
         }
         else

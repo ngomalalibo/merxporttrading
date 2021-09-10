@@ -1,9 +1,11 @@
 package com.merxport.trading.serviceImpl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.merxport.trading.AbstractIntegrationTest;
 import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.CommodityService;
 import com.merxport.trading.services.UserService;
 import org.bson.types.Decimal128;
@@ -25,6 +27,9 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     
     @Autowired
     private UserService userService;
+    private TypeReference<List<Commodity>> typeReferenceList = new TypeReference<>()
+    {
+    };
     
     @Test
     void save() throws IOException
@@ -36,7 +41,7 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
                                             faker.commerce().productName(), new HashMap<>(),
                                             faker.book().title(),
                                             Collections.singletonList(imageID),
-                                            new BigDecimal(100000), faker.number().numberBetween(1,50), faker.stock().nsdqSymbol(), user,
+                                            new BigDecimal(100000), faker.number().numberBetween(1, 50), faker.stock().nsdqSymbol(), user,
                                             faker.country().name(),
                                             Scopes.INTERNATIONAL);
         Commodity save = commodityService.save(commodity);
@@ -53,7 +58,8 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     @Test
     void findCommodityByCategoryLike()
     {
-        List<Commodity> commodities = commodityService.findCommodityByCategoryLike("u");
+        PageableResponse pageableResponse = commodityService.findCommodityByCategoryLike("u", 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(3, commodities.size());
         assertEquals("Publishing", commodities.get(0).getCategory().get(0));
     }
@@ -61,7 +67,8 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     @Test
     void findCommodityByCountry()
     {
-        List<Commodity> commodities = commodityService.findCommodityByCountry("Iceland");
+        PageableResponse pageableResponse = commodityService.findCommodityByCountry("Iceland", 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, commodities.size());
         assertEquals("Iceland", commodities.get(0).getCountry());
     }
@@ -69,7 +76,8 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     @Test
     void findCommodityByAmountGreaterThan()
     {
-        List<Commodity> commodities = commodityService.findCommodityByAmountGreaterThan(new BigDecimal(30000));
+        PageableResponse pageableResponse = commodityService.findCommodityByAmountGreaterThan(new BigDecimal(30000), 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(6, commodities.size());
         assertEquals(new BigDecimal(100000), commodities.get(0).getRate());
     }
@@ -77,7 +85,8 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     @Test
     void findCommodityByAmountLessThan()
     {
-        List<Commodity> commodities = commodityService.findCommodityByAmountLessThan(new BigDecimal(40000));
+        PageableResponse pageableResponse = commodityService.findCommodityByAmountLessThan(new BigDecimal(40000), 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, commodities.size());
         assertEquals(new BigDecimal(30000), commodities.get(0).getRate());
     }
@@ -85,8 +94,10 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     @Test
     void findCommodityByScope()
     {
-        List<Commodity> commodities = commodityService.findCommodityByScope(Scopes.INTERNATIONAL);
-        assertEquals(7, commodities.size());
+        PageableResponse pageableResponse = commodityService.findCommodityByScope(Scopes.INTERNATIONAL, 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertEquals(6, commodities.size());
+        // assertEquals(7, commodities.size());
         assertEquals("INTERNATIONAL", commodities.get(0).getScope().name());
     }
     
@@ -96,7 +107,8 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
         String sellerId = "6126a4897f80646d7836a051";
         User user = new User();
         user.setId(sellerId);
-        List<Commodity> commodities = commodityService.findCommodityBySeller(user);
+        PageableResponse pageableResponse = commodityService.findCommodityBySeller(user, 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(7, commodities.size());
         assertEquals("Synergistic Cotton Computer", commodities.get(0).getName());
     }
@@ -104,9 +116,10 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     @Test
     void findCommoditySearch()
     {
-        List<Commodity> commodityFacets = commodityService.findCommoditySearch("Iceland", "Services", new BigDecimal(40000), Scopes.INTERNATIONAL);
-        assertEquals(6, commodityFacets.size());
-        assertTrue(commodityFacets.get(0).getDescription().contains("Descriptio"));
+        PageableResponse pageableResponse = commodityService.findCommoditySearch("Iceland", "Services", new BigDecimal(40000), Scopes.INTERNATIONAL, 0, 6);
+        List<Commodity> commodities = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertEquals(6, commodities.size());
+        assertTrue(commodities.get(0).getDescription().contains("Descriptio"));
         
     }
     

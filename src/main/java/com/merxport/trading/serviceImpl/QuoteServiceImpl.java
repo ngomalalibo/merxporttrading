@@ -6,23 +6,20 @@ import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.enumerations.QuoteStatus;
 import com.merxport.trading.exception.CustomNullPointerException;
 import com.merxport.trading.repositories.QuoteRepository;
+import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.QuoteService;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class QuoteServiceImpl implements QuoteService
@@ -36,6 +33,9 @@ public class QuoteServiceImpl implements QuoteService
     
     @Autowired
     private MongoTemplate mongoTemplate;
+    
+    @Autowired
+    private FindServiceImpl findService;
     
     @Loggable
     @Override
@@ -52,9 +52,9 @@ public class QuoteServiceImpl implements QuoteService
     }
     
     @Override
-    public List<Quote> findQuoteByRFQ(RFQ rfq)
+    public PageableResponse findQuoteByRFQ(RFQ rfq, int page, int pageSize)
     {
-        return findQuote(Criteria.where("rfq._id").is(new ObjectId(rfq.getId())), true);
+        return findQuote(Criteria.where("rfq._id").is(new ObjectId(rfq.getId())), true, page, pageSize);
     }
     
     @Override
@@ -65,7 +65,7 @@ public class QuoteServiceImpl implements QuoteService
         Query q = new Query(Criteria.where("_id").is(quote.getId()));
         Update update = new Update();
         update.set("accepted", quoteStatus);
-        update.set("audit.modifiedBy", "System");
+        update.set("audit.modifiedBy", quote.getSessionUser());
         update.set("audit.modifiedDate", now);
         UpdateResult updateResult = mongoTemplate.updateFirst(q, update, quote.getClass());
         if (updateResult.wasAcknowledged() && updateResult.getMatchedCount() == 1)
@@ -73,7 +73,7 @@ public class QuoteServiceImpl implements QuoteService
             quote = quoteRepository.findById(quote.getId()).orElse(null);
             assert quote != null;
             quote.getAudit().setModifiedDate(now);
-            quote.getAudit().setModifiedBy("System");
+            quote.getAudit().setModifiedBy(quote.getSessionUser());
             return quote;
         }
         else
@@ -83,26 +83,29 @@ public class QuoteServiceImpl implements QuoteService
     }
     
     @Override
-    public List<Quote> findQuoteByStatusAndSeller(String sellerID, QuoteStatus quoteStatus)
+    public PageableResponse findQuoteByStatusAndSeller(String sellerID, QuoteStatus quoteStatus, int page, int pageSize)
     {
-        return findQuote(Criteria.where("seller._id").is(new ObjectId(sellerID)).and("quoteStatus").is(quoteStatus.name()), true);
+        return findQuote(Criteria.where("seller._id").is(new ObjectId(sellerID)).and("quoteStatus").is(quoteStatus.name()), true, page, pageSize);
     }
     
     @Override
-    public List<Quote> findAllQuotesBySeller(String sellerID)
+    public PageableResponse findAllQuotesBySeller(String sellerID, int page, int pageSize)
     {
-        return findQuote(Criteria.where("seller._id").is(new ObjectId(sellerID)), true);
+        return findQuote(Criteria.where("seller._id").is(new ObjectId(sellerID)), true, page, pageSize);
     }
     
     @Override
-    public List<Quote> findAllActive()
+    public PageableResponse findAllActive(int page, int pageSize)
     {
-        return findQuote(Criteria.where("isActive").is(true), true);
+        // return findQuote(Criteria.where("isActive").is(true), true);
+        return findQuote(Criteria.where("isActive").is(true), true, page, pageSize);
     }
     
-    public List<Quote> findQuote(Criteria criteria, boolean isActive)
+    public PageableResponse findQuote(Criteria criteria, boolean isActive, int page, int pageSize)
     {
-        AggregationOperation operation = Aggregation.match(criteria);
+        return findService.find(new Quote(), "quotes", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
+        
+        /*AggregationOperation operation = Aggregation.match(criteria);
         AggregationOperation operationActive = Aggregation.match(Criteria.where("isActive").is(isActive));
         List<AggregationOperation> aggPipeline = new ArrayList<>();
         aggPipeline.add(operation);
@@ -113,5 +116,6 @@ public class QuoteServiceImpl implements QuoteService
         quotes.forEach(System.out::println);
         
         return quotes;
+         */
     }
 }

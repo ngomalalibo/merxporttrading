@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Map;
 @Document(collection = "commodities")
 public class Commodity extends PersistingBaseEntity
 {
+    @NotBlank(message = "Name is mandatory")
     private String name;
     private List<String> category;
     @Column(length = 500)

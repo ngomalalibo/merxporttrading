@@ -1,6 +1,7 @@
 package com.merxport.trading.repositories;
 
 import com.merxport.trading.entities.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

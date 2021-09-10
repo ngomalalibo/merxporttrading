@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,5 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "categories")
 public class CommodityCategory extends PersistingBaseEntity
 {
+    @NotBlank(message = "Category name is mandatory")
     private String name;
 }

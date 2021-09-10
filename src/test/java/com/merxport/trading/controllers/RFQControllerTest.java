@@ -1,7 +1,10 @@
 package com.merxport.trading.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.AbstractIntegrationTest;
 import com.merxport.trading.entities.Commodity;
+import com.merxport.trading.entities.Quote;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.entities.Unit;
 import com.merxport.trading.enumerations.CommercialTerms;
@@ -9,8 +12,10 @@ import com.merxport.trading.enumerations.RFQPriority;
 import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.repositories.CommodityRepository;
 import com.merxport.trading.repositories.UnitRepository;
+import com.merxport.trading.response.PageableResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +38,17 @@ class RFQControllerTest extends AbstractIntegrationTest
     @Autowired
     private UnitRepository unitRepository;
     
-    private final ParameterizedTypeReference<List<RFQ>> typeReference = new ParameterizedTypeReference<List<RFQ>>()
+    private final ParameterizedTypeReference<PageableResponse> typeReference = new ParameterizedTypeReference<PageableResponse>()
+    {
+    };
+    
+    private final ParameterizedTypeReference<List<RFQ>> paramTypeReference = new ParameterizedTypeReference<List<RFQ>>()
+    {
+    };
+    @Qualifier("getObjectMapper")
+    @Autowired
+    private ObjectMapper objectMapper;
+    private TypeReference<List<RFQ>> typeReferenceList = new TypeReference<>()
     {
     };
     
@@ -71,10 +86,13 @@ class RFQControllerTest extends AbstractIntegrationTest
         {{
             put("name", name);
         }};
-        ResponseEntity<List<RFQ>> result = restTemplate.exchange("/api/rfqByCommodityName/{name}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
-        List<RFQ> rfqs = result.getBody();
+        ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfqByCommodityName/{name}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+    
+        PageableResponse pageableResponse = result.getBody();
+        assertNotNull(pageableResponse);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertNotNull(rfqs);
-        assertEquals(2, rfqs.size());
+        assertEquals(3, rfqs.size());
         assertEquals("Ergonomic Cotton Lamp", rfqs.get(0).getCommodity().getName());
     }
     
@@ -86,10 +104,12 @@ class RFQControllerTest extends AbstractIntegrationTest
         {{
             put("country", country);
         }};
-        ResponseEntity<List<RFQ>> result = restTemplate.exchange("/api/rfqByCountry/{country}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
-        List<RFQ> rfqs = result.getBody();
+        ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfqByCountry/{country}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = result.getBody();
+        assertNotNull(pageableResponse);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertNotNull(rfqs);
-        assertEquals(2, rfqs.size());
+        assertEquals(3, rfqs.size());
         assertEquals("Nigeria", rfqs.get(0).getCountry());
     }
     
@@ -101,10 +121,12 @@ class RFQControllerTest extends AbstractIntegrationTest
         {{
             put("term", term.name());
         }};
-        ResponseEntity<List<RFQ>> result = restTemplate.exchange("/api/rfqByTerm/{term}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
-        List<RFQ> rfqs = result.getBody();
+        ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfqByTerm/{term}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = result.getBody();
+        assertNotNull(pageableResponse);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertNotNull(rfqs);
-        assertEquals(2, rfqs.size());
+        assertEquals(3, rfqs.size());
         assertEquals("COST_INSURANCE_AND_FREIGHT", rfqs.get(0).getTerm().name());
     }
     
@@ -116,8 +138,10 @@ class RFQControllerTest extends AbstractIntegrationTest
         {{
             put("title", title);
         }};
-        ResponseEntity<List<RFQ>> result = restTemplate.exchange("/api/rfqByTitle/{title}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
-        List<RFQ> rfqs = result.getBody();
+        ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfqByTitle/{title}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = result.getBody();
+        assertNotNull(pageableResponse);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertNotNull(rfqs);
         assertEquals(1, rfqs.size());
         assertEquals("Gorgeous Granite Gloves", rfqs.get(0).getTitle());

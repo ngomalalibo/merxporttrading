@@ -1,5 +1,7 @@
 package com.merxport.trading.serviceImpl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.AbstractIntegrationTest;
 import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.RFQ;
@@ -10,10 +12,12 @@ import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.repositories.CommodityRepository;
 import com.merxport.trading.repositories.RFQRepository;
 import com.merxport.trading.repositories.UnitRepository;
+import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.CommodityService;
 import com.merxport.trading.services.RFQService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -38,6 +42,14 @@ class RFQServiceImplTest extends AbstractIntegrationTest
     
     @Autowired
     private UnitRepository unitRepository;
+    
+    @Qualifier("getObjectMapper")
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    private TypeReference<List<RFQ>> typeReferenceList = new TypeReference<>()
+    {
+    };
     
     public RFQ getRFQ()
     {
@@ -77,7 +89,8 @@ class RFQServiceImplTest extends AbstractIntegrationTest
     @Test
     void findRFQByTitleLike()
     {
-        List<RFQ> rfqs = rfqService.findRFQByTitleLike("Granit");
+        PageableResponse pageableResponse = rfqService.findRFQByTitleLike("Granit", 0, 6);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, rfqs.size());
         assertEquals("Gorgeous Granite Gloves", rfqs.get(0).getTitle());
     }
@@ -86,7 +99,8 @@ class RFQServiceImplTest extends AbstractIntegrationTest
     void findRFQByCommodityNameLike()
     {
         String name = "Ergonomic";
-        List<RFQ> rfqs = rfqService.findRFQByCommodityNameLike(name);
+        PageableResponse pageableResponse = rfqService.findRFQByCommodityNameLike(name, 0, 6);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, rfqs.size());
         assertEquals("Ergonomic Cotton Lamp", rfqs.get(0).getCommodity().getName());
     }
@@ -95,7 +109,8 @@ class RFQServiceImplTest extends AbstractIntegrationTest
     void findRFQByCountry()
     {
         String country = "Nigeria";
-        List<RFQ> rfqs = rfqService.findRFQByCountry(country);
+        PageableResponse pageableResponse = rfqService.findRFQByCountry(country, 0, 6);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, rfqs.size());
         assertEquals("Nigeria", rfqs.get(0).getCountry());
     }
@@ -104,7 +119,8 @@ class RFQServiceImplTest extends AbstractIntegrationTest
     void findRFQByTerm()
     {
         CommercialTerms term = CommercialTerms.COST_INSURANCE_AND_FREIGHT;
-        List<RFQ> rfqs = rfqService.findRFQByTerm(term);
+        PageableResponse pageableResponse = rfqService.findRFQByTerm(term, 0, 6);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, rfqs.size());
         assertEquals("COST_INSURANCE_AND_FREIGHT", rfqs.get(0).getTerm().name());
     }

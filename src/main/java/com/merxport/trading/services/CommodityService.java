@@ -4,9 +4,11 @@ package com.merxport.trading.services;
 import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.response.PageableResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public interface CommodityService
 {
@@ -14,17 +16,20 @@ public interface CommodityService
     
     Commodity delete(Commodity c);
     
-    List<Commodity> findCommodityByCategoryLike(String category);
+    PageableResponse findCommodityByCategoryLike(String category, int page, int pageSize);
     
-    List<Commodity> findCommodityByCountry(String country);
+    PageableResponse findCommodityByCountry(String country, int page, int pageSize);
     
-    List<Commodity> findCommodityByAmountGreaterThan(BigDecimal amount);
+    PageableResponse findCommodityByAmountGreaterThan(BigDecimal amount, int page, int pageSize);
     
-    List<Commodity> findCommodityByAmountLessThan(BigDecimal amount);
+    PageableResponse findCommodityByAmountLessThan(BigDecimal amount, int page, int pageSize);
     
-    List<Commodity> findCommodityByScope(Scopes scope);
+    PageableResponse findCommodityByScope(Scopes scope, int page, int pageSize);
     
-    List<Commodity> findCommodityBySeller(User seller);
+    PageableResponse findCommodityBySeller(User seller, int page, int pageSize);
     
-    List<Commodity> findCommoditySearch(String country, String category, BigDecimal amount, Scopes scopes);
+    PageableResponse findCommoditySearch(String country, String category, BigDecimal amount, Scopes scopes, int page, int pageSize);
+    
+    PageableResponse findByNameLikeOrderByNameAsc(String name, int page, int pageSize);
+    PageableResponse findByNameLikeOrDescriptionLikeOrCategoryLikeOrderByNameAsc(String name, int page, int pageSize);
 }

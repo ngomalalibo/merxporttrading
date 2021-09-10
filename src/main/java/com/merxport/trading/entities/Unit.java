@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "units")
 public class Unit extends PersistingBaseEntity
 {
+    @NotBlank(message = "Name is mandatory")
     private String singularName;
     private String pluralName;
 }

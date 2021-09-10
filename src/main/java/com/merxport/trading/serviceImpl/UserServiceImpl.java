@@ -6,8 +6,8 @@ import com.merxport.trading.aspect.Loggable;
 import com.merxport.trading.config.GenerateVerificationCode;
 import com.merxport.trading.email.SendMail_Working;
 import com.merxport.trading.entities.User;
-import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.exception.CustomNullPointerException;
 import com.merxport.trading.exception.DuplicateEntityException;
 import com.merxport.trading.exception.EntityNotFoundException;
@@ -21,6 +21,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -73,6 +74,11 @@ public class UserServiceImpl implements UserService
     @Autowired
     private DeleteServiceImpl deleteService;
     
+    @Autowired
+    private UserService userService;
+    
+    @Value("${pagination.page-size}")
+    private int pageSize;
     
     @Loggable
     @Override
@@ -216,6 +222,8 @@ public class UserServiceImpl implements UserService
         SecurityContextHolder.getContext().setAuthentication(authentication);
         
         Gson gson = new Gson();
+        User user = userService.findByEmail(username);
+        request.getSession().setAttribute("user", user);
         // System.out.println("Auth User: " + gson.toJson(login));
         return login;
     }

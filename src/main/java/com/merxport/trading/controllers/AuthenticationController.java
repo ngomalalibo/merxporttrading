@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 
@@ -24,7 +25,7 @@ public class AuthenticationController
     
     
     @PostMapping("/user")
-    public ResponseEntity<User> addUser(@RequestBody User user) throws IOException
+    public ResponseEntity<User> addUser(@Valid @RequestBody User user) throws IOException
     {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user").toUriString());
         // return ResponseEntity.created(uri).header("TOKEN", user.getToken()).body(userService.save(user));
@@ -32,13 +33,13 @@ public class AuthenticationController
     }
     
     @PutMapping("/user")
-    public ResponseEntity<User> updateUser(@RequestBody User user) throws IOException
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) throws IOException
     {
         return ResponseEntity.ok(userService.save(user));
     }
     
     @PostMapping("/auth")
-    public ResponseEntity<User> login(@RequestBody AuthenticationRequest authenticationRequest, HttpServletRequest request) throws Exception
+    public ResponseEntity<User> login(@Valid @RequestBody AuthenticationRequest authenticationRequest, HttpServletRequest request) throws Exception
     {
         User login = userService.authenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword(), request);
         return ResponseEntity.ok(login);

@@ -1,8 +1,8 @@
 package com.merxport.trading.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.UserType;
 import com.merxport.trading.security.VerificationPOJO;
 import lombok.*;
@@ -24,9 +24,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends PersistingBaseEntity
 {
-    @NotBlank
+    @NotBlank(message = "First name is mandatory")
     private String firstName;
-    @NotBlank
+    @NotBlank(message = "Last name is mandatory")
     private String lastName;
     private String middleName;
     @NotBlank

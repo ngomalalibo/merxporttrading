@@ -1,5 +1,7 @@
 package com.merxport.trading.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
@@ -10,11 +12,12 @@ import com.merxport.trading.enumerations.QuoteStatus;
 import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.repositories.QuoteRepository;
 import com.merxport.trading.repositories.RFQRepository;
-import com.merxport.trading.repositories.UserRepository;
+import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.QuoteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -40,14 +43,23 @@ class QuoteControllerTest extends AbstractIntegrationTest
     
     private Quote quote;
     
-    private final ParameterizedTypeReference<List<Quote>> typeReference = new ParameterizedTypeReference<List<Quote>>()
+    private final ParameterizedTypeReference<PageableResponse> typeReference = new ParameterizedTypeReference<PageableResponse>()
+    {
+    };
+    
+    private final ParameterizedTypeReference<List<Quote>> paramTypeReference = new ParameterizedTypeReference<List<Quote>>()
+    {
+    };
+    @Qualifier("getObjectMapper")
+    @Autowired
+    private ObjectMapper objectMapper;
+    private TypeReference<List<Quote>> typeReferenceList = new TypeReference<>()
     {
     };
     
     RFQ rfq;
     
-    @Autowired
-    private UserRepository userRepository;
+   
     
     @BeforeEach
     public void setup()
@@ -89,26 +101,35 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getQuotes()
     {
-        ResponseEntity<List<Quote>> getQuotes = restTemplate.exchange("/api/quotes?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference);
-        assertNotNull(getQuotes.getBody());
-        assertEquals(2, getQuotes.getBody().size());
+        ResponseEntity<List<Quote>> response = restTemplate.exchange("/api/quotes?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, paramTypeReference);
+        List<Quote> responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(2, responseBody.size());
     }
     
     @Test
     void getQuotesActive()
     {
-        ResponseEntity<List<Quote>> getQuotes = restTemplate.exchange("/api/quotesActive?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference);
-        assertNotNull(getQuotes.getBody());
-        assertEquals(1, getQuotes.getBody().size());
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesActive?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference);
+        PageableResponse pageableResponse = getQuotes.getBody();
+        assertNotNull(pageableResponse);
+        List<Quote> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertNotNull(responseBody);
+        assertEquals(2, responseBody.size());
     }
     
     @Test
     void getQuoteByRFQ()
     {
-        ResponseEntity<List<Quote>> getQuotes = restTemplate.exchange("/api/quoteByRFQ/{id}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6132233e12e8966bf50d04eb");
-        assertNotNull(getQuotes.getBody());
-        assertEquals(1, getQuotes.getBody().size());
-        assertEquals(getQuotes.getBody().get(0).getRfq().getTitle(), "Gorgeous Granite Gloves");
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quoteByRFQ/{id}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6132233e12e8966bf50d04eb");
+        PageableResponse pageableResponse = getQuotes.getBody();
+        assertNotNull(pageableResponse);
+        
+        List<Quote> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertNotNull(responseBody);
+        assertEquals(2, responseBody.size());
+        System.out.println("ResponseBody: "+responseBody.get(0));
+        assertEquals(((Quote) responseBody.get(0)).getRfq().getTitle(), "Gorgeous Granite Gloves");
     }
     
     @Test
@@ -122,18 +143,24 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getAcceptedQuotesBySeller()
     {
-        ResponseEntity<List<Quote>> getQuotes = restTemplate.exchange("/api/quotesAcceptedBySeller/{sellerID}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
-        assertNotNull(getQuotes.getBody());
-        assertEquals(1, getQuotes.getBody().size());
-        assertEquals(getQuotes.getBody().get(0).getRfq().getTitle(), "Gorgeous Granite Gloves");
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesAcceptedBySeller/{sellerID}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
+        PageableResponse pageable = getQuotes.getBody();
+        assertNotNull(pageable);
+        List<Quote> responseBody = objectMapper.convertValue(pageable.getResponseBody(), typeReferenceList);
+        assertNotNull(responseBody);
+        assertEquals(1, responseBody.size());
+        assertEquals(responseBody.get(0).getRfq().getTitle(), "Gorgeous Granite Gloves");
     }
     
     @Test
     void getAllQuotesBySeller()
     {
-        ResponseEntity<List<Quote>> getQuotes = restTemplate.exchange("/api/quotesAllBySeller/{sellerID}?token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
-        assertNotNull(getQuotes.getBody());
-        assertEquals(1, getQuotes.getBody().size());
-        assertEquals(getQuotes.getBody().get(0).getRfq().getTitle(), "Gorgeous Granite Gloves");
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesAllBySeller/{sellerID}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
+        PageableResponse pageable = getQuotes.getBody();
+        assertNotNull(pageable);
+        List<Quote> responseBody = objectMapper.convertValue(pageable.getResponseBody(), typeReferenceList);
+        assertNotNull(responseBody);
+        assertEquals(1, responseBody.size());
+        assertEquals(responseBody.get(0).getRfq().getTitle(), "Gorgeous Granite Gloves");
     }
 }

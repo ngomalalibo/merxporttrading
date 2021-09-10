@@ -2,8 +2,7 @@ package com.merxport.trading.services;
 
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.enumerations.CommercialTerms;
-
-import java.util.List;
+import com.merxport.trading.response.PageableResponse;
 
 public interface RFQService
 {
@@ -11,11 +10,11 @@ public interface RFQService
     
     RFQ delete(RFQ rfq);
     
-    List<RFQ> findRFQByTitleLike(String title);
+    PageableResponse findRFQByTitleLike(String title, int page, int pageSize);
     
-    List<RFQ> findRFQByCommodityNameLike(String name);
+    PageableResponse findRFQByCommodityNameLike(String name, int page, int pageSize);
     
-    List<RFQ> findRFQByCountry(String country);
+    PageableResponse findRFQByCountry(String country, int page, int pageSize);
     
-    List<RFQ> findRFQByTerm(CommercialTerms term);
+    PageableResponse findRFQByTerm(CommercialTerms term, int page, int pageSize);
 }
