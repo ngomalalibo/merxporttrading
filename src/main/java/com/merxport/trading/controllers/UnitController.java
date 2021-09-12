@@ -44,10 +44,16 @@ public class UnitController
     }
     
     @GetMapping("/units/{name}")
-    public ResponseEntity<List<Unit>> getUnits(@PathVariable(required = false) String name, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<List<Unit>> getUnitsByName(@PathVariable(required = false) String name, @RequestParam("token") String token) throws IOException
     {
         name = (name == null ? "" : name);
         return ResponseEntity.ok(unitRepository.findBySingularNameLikeOrderBySingularNameAsc(name, PageRequest.of(0, 6 )));
+    }
+    
+    @GetMapping("/units")
+    public ResponseEntity<List<Unit>> getAllUnits(@RequestParam("token") String token) throws IOException
+    {
+        return ResponseEntity.ok(unitRepository.findAll());
     }
     
     @DeleteMapping("/unit/{id}")

@@ -1,6 +1,7 @@
 package com.merxport.trading.serviceImpl;
 
 import com.merxport.trading.entities.PersistingBaseEntity;
+import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.response.PageableResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,6 @@ import org.springframework.data.mongodb.core.aggregation.CountOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,8 @@ public class FindServiceImpl
     
     public <T extends PersistingBaseEntity> PageableResponse find(T t, String collection, Criteria criteria, boolean isActive, int pageSize, long page, Sort sort)
     {
+        
+        
         AggregationOperation operation = Aggregation.match(criteria);
         AggregationOperation operationActive = Aggregation.match(Criteria.where("isActive").is(isActive));
         CountOperation operationCount = Aggregation.count().as("totalItems");
@@ -50,6 +52,11 @@ public class FindServiceImpl
         }
         long totalPages = (long) Math.ceil(totalItems / pageSize);
         pageableResponse.setTotalPages(totalPages == 0 ? 1 : totalPages);
+        
+        if (page > pageableResponse.getTotalPages())
+        {
+            throw new EntityNotFoundException("Page not found");
+        }
         
         aggPipeline = new LinkedList<>();
         AggregationOperation operationOffset = Aggregation.skip(page * pageSize);
