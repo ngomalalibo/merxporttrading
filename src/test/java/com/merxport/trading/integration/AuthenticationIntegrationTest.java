@@ -71,7 +71,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
         
         User user = new User("Ngoo", "Alaliboo", "Martin", "ngomalalibo@yahoo.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID.getBody(), List.of(UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
         
-        ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("/user", user, User.class);
+        ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("https://merxporttrading.herokuapp.com/user", user, User.class);
         Assert.assertEquals(201, userResponseEntity.getStatusCode().value());
         Assert.assertEquals(MediaType.APPLICATION_JSON, userResponseEntity.getHeaders().getContentType());
         /*mockMvc.perform(MockMvcRequestBuilders.post("/user")
@@ -103,8 +103,8 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
     @Test
     void verifyUser() throws Exception
     {
-        String code = "135256";
-        String id = "613ea4ea3e2c8f5489e03443";
+        String code = "161196";
+        String id = "613f30e50a472a0024e4393e";
         Map<String, String> uriVars = new HashMap<>()
         {{
             put("id", id);
@@ -112,7 +112,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
             
         }};
         
-        User user = restTemplate.getForEntity("/user/verify/{id}/{code}", User.class, uriVars).getBody();
+        User user = restTemplate.getForEntity("https://merxporttrading.herokuapp.com/user/verify/{id}/{code}", User.class, uriVars).getBody();
         assertNotNull(user);
         assertTrue(user.isVerified());
     }
