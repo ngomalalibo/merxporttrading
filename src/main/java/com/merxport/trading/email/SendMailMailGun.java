@@ -7,10 +7,12 @@ import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.security.VerificationPOJO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -19,7 +21,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
-@Component
 public class SendMailMailGun
 {
     private String MAILGUN_KEY = System.getenv().get("MAILGUN_KEY");
@@ -49,18 +50,6 @@ public class SendMailMailGun
         }
     }
     
-    public String sendSimpleMessage(ActionableEmail actionableEmail, String template) throws UnirestException
-    {
-        HttpResponse<String> response = Unirest.post("https://api.mailgun.net/v3/" + DOMAIN + "/messages")
-                                               .basicAuth("api", MAILGUN_KEY)
-                                               .field("from", actionableEmail.getFromAddresses())
-                                               .field("to", actionableEmail.getToAddresses())
-                                               .field("subject", actionableEmail.getSubject())
-                                               .field("html", template)
-                                               .asString();
-        return response.getBody();
-    }
-    
     public ActionableEmail getMailInstance(User user)
     {
         ActionableEmail mailObject = new ActionableEmail();
@@ -76,6 +65,40 @@ public class SendMailMailGun
         
         return mailObject;
     }
+    
+    public String sendMail(User user) throws UnirestException
+    {
+        ActionableEmail mailInstance = getMailInstance(user);
+        String mailHTML = populateTemplate(mailInstance);
+        
+        String response = sendSimpleMessage(mailInstance, mailHTML);
+        System.out.println("Response: " + response);
+        return response;
+    }
+    
+    public String sendSimpleMessage(ActionableEmail actionableEmail, String template) throws UnirestException
+    {
+        try
+        {
+            InternetAddress internetAddress = new InternetAddress(username != null ? username : "weblibrarianapp@gmail.com");
+            internetAddress.setPersonal("Merxport Trading");
+            
+            HttpResponse<String> response = Unirest.post("https://api.mailgun.net/v3/" + DOMAIN + "/messages")
+                                                   .basicAuth("api", MAILGUN_KEY)
+                                                   .field("from", internetAddress)
+                                                   .field("to", actionableEmail.getToAddresses())
+                                                   .field("subject", actionableEmail.getSubject())
+                                                   .field("html", template)
+                                                   .asString();
+            return response.getBody();
+        }
+        catch (MessagingException | UnsupportedEncodingException mex)
+        {
+            mex.printStackTrace();
+            return "Message not sent";
+        }
+    }
+    
     
     public String populateTemplate(ActionableEmail actionableEmail)
     {
@@ -93,17 +116,13 @@ public class SendMailMailGun
         try
         {
             SendMailMailGun sendMail = new SendMailMailGun();
-            User user = User.builder().firstName("Ngo").lastName("Alalibo").email("ngomalalibo@gmail.com").password("password")
+            User user = User.builder().firstName("Ngo").lastName("Alalibo").email("ngomalalibo@yahoo.com").password("password")
                             .isVerified(true).verificationPOJO(new VerificationPOJO("123456", LocalDateTime.now())).userRoles(List.of(UserRole.BUYER, UserRole.SELLER)).build();
-            ActionableEmail mailInstance = sendMail.getMailInstance(user);
-            String temp = sendMail.populateTemplate(mailInstance);
-            
-            String response = sendMail.sendSimpleMessage(mailInstance, temp);
-            System.out.println("Response " + response);
+            sendMail.sendMail(user);
         }
         catch (Exception e)
         {
-            System.out.println("UnirestException " + e.getMessage());
+            System.out.println("Mail not sent!" + e.getMessage());
             e.printStackTrace();
             
         }
