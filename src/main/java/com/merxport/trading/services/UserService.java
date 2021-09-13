@@ -1,8 +1,9 @@
 package com.merxport.trading.services;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.merxport.trading.entities.User;
-import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserRole;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,11 +12,11 @@ import java.util.List;
 
 public interface UserService
 {
-    User save(User user);
+    User save(User user) throws UnirestException;
     
     User findUser(String id) throws IOException;
     
-    void resendCode(String id);
+    void resendCode(String id) throws UnirestException;
     
     User findByEmail(String email);
     

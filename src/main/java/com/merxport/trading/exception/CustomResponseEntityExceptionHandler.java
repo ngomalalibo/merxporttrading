@@ -1,5 +1,6 @@
 package com.merxport.trading.exception;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.merxport.trading.response.ApiException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -227,6 +228,16 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
                 HttpStatus.INTERNAL_SERVER_ERROR, message, "HttpServer Error");
         System.out.println(message);
         return buildResponseEntity(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    @ExceptionHandler({UnirestException.class})
+    public ResponseEntity<Object> handleUnirestException(UnirestException ex)
+    {
+        String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage() + " " + ex.getMessage();
+        ApiException apiResponse = new ApiException(
+                HttpStatus.NOT_IMPLEMENTED, message, "Email not sent");
+        System.out.println(message);
+        return buildResponseEntity(apiResponse, HttpStatus.NOT_IMPLEMENTED);
     }
     
     

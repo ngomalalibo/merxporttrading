@@ -2,9 +2,10 @@ package com.merxport.trading.serviceImpl;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.merxport.trading.aspect.Loggable;
 import com.merxport.trading.config.GenerateVerificationCode;
-import com.merxport.trading.email.SendMail_Working;
+import com.merxport.trading.email.SendMailMailGun;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.Scopes;
 import com.merxport.trading.enumerations.UserRole;
@@ -48,9 +49,9 @@ public class UserServiceImpl implements UserService
     @Autowired
     private UserRepository userRepository;
     
-    @Qualifier("sendMail")
+    @Qualifier("sendMailMailGun")
     @Autowired
-    private SendMail_Working sendMail;
+    private SendMailMailGun sendMail;
     
     @Autowired
     private GridFsTemplate gridFsTemplate;
@@ -82,7 +83,7 @@ public class UserServiceImpl implements UserService
     
     @Loggable
     @Override
-    public User save(User user)
+    public User save(User user) throws UnirestException
     {
         if (!Strings.isNullOrEmpty(user.getPassword()))
         {
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService
             throw new DuplicateEntityException("Duplicate user. User exists!");
         }
         User saved = userRepository.save(user);
-        System.out.println(sendMail.sendMail(saved));
+        sendMail.sendMail(saved);
         return saved;
     }
     
@@ -301,7 +302,7 @@ public class UserServiceImpl implements UserService
     }
     
     @Override
-    public void resendCode(String id)
+    public void resendCode(String id) throws UnirestException
     {
         if (Strings.isNullOrEmpty(id))
         {

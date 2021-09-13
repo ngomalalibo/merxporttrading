@@ -1,5 +1,6 @@
 package com.merxport.trading.config;
 
+import com.merxport.trading.email.SendMailMailGun;
 import com.merxport.trading.email.SendMail_Working;
 import com.merxport.trading.serviceImpl.DeleteServiceImpl;
 import com.merxport.trading.serviceImpl.FindServiceImpl;
@@ -28,6 +29,12 @@ public class WebConfig extends WebMvcConfigurationSupport
     public SendMail_Working sendMail()
     {
         return new SendMail_Working();
+    }
+    
+    @Bean
+    public SendMailMailGun sendMailMailGun()
+    {
+        return new SendMailMailGun();
     }
     
     @Bean

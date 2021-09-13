@@ -1,9 +1,10 @@
 package com.merxport.trading.serviceImpl;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.merxport.trading.entities.Address;
 import com.merxport.trading.entities.User;
-import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.UserType;
 import com.merxport.trading.services.UserService;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -67,7 +68,7 @@ class UserServiceImplTest
     }
     
     @Test
-    void save() throws IOException
+    void save() throws IOException, UnirestException
     {
         System.out.println("Current working directory: " + Paths.get(".").toAbsolutePath().normalize().toString());
         File file = new File("./src/main/resources/static/images/team4.jpg");

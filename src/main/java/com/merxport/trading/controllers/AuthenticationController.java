@@ -1,5 +1,6 @@
 package com.merxport.trading.controllers;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.security.AuthenticationRequest;
 import com.merxport.trading.services.UserService;
@@ -25,7 +26,7 @@ public class AuthenticationController
     
     
     @PostMapping("/user")
-    public ResponseEntity<User> addUser(@Valid @RequestBody User user) throws IOException
+    public ResponseEntity<User> addUser(@Valid @RequestBody User user) throws IOException, UnirestException
     {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user").toUriString());
         // return ResponseEntity.created(uri).header("TOKEN", user.getToken()).body(userService.save(user));
@@ -33,7 +34,7 @@ public class AuthenticationController
     }
     
     @PutMapping("/user")
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) throws IOException
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) throws IOException, UnirestException
     {
         return ResponseEntity.ok(userService.save(user));
     }
@@ -52,7 +53,7 @@ public class AuthenticationController
     }
     
     @GetMapping("/user/{id}/resendCode")
-    public ResponseEntity<?> resendCode(@PathVariable String id)
+    public ResponseEntity<?> resendCode(@PathVariable String id) throws UnirestException
     {
         userService.resendCode(id);
         return ResponseEntity.ok(null);

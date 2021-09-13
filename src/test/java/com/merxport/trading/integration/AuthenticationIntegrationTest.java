@@ -103,8 +103,8 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
     @Test
     void verifyUser() throws Exception
     {
-        String code = "510847";
-        String id = "613b11a0ff0319555ed486b8";
+        String code = "135256";
+        String id = "613ea4ea3e2c8f5489e03443";
         Map<String, String> uriVars = new HashMap<>()
         {{
             put("id", id);

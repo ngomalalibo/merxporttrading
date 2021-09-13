@@ -36,7 +36,6 @@ class AuthenticationControllerTest extends AbstractControllerTest
         Assertions.assertThat(authenticationController).isNotNull();
     }
     
-    @org.junit.Test(expected = DuplicateEntityException.class)
     @Test
     void addUser() throws Exception
     {
