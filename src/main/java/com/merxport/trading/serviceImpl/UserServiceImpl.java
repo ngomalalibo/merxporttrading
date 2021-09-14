@@ -215,9 +215,13 @@ public class UserServiceImpl implements UserService
     public User authenticateUser(String username, String password, HttpServletRequest request) throws Exception
     {
         User login = userRepository.findByEmail(username);
-        if (login == null || !passwordEncoder.getPasswordEncoder().matches(password, login.getPassword()))
+        if (login == null)
         {
-            throw new AccessDeniedException("Login was not successful");
+            throw new AccessDeniedException("User does not exist");
+        }
+        if (!passwordEncoder.getPasswordEncoder().matches(password, login.getPassword()))
+        {
+            throw new AccessDeniedException("Incorrect password");
         }
         Authentication authentication = jwtTokenProvider.getAuthentication(login.getToken(), request);
         SecurityContextHolder.getContext().setAuthentication(authentication);
