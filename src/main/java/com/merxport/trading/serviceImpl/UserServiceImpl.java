@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService
     private GenerateVerificationCode generateVerificationCode;
     
     @Autowired
-    private PasswordEncoder getPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
     
     @Autowired
     private DeleteServiceImpl deleteService;
@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService
     {
         if (!Strings.isNullOrEmpty(user.getPassword()))
         {
-            String encodedPassword = getPasswordEncoder.getPasswordEncoder().encode(user.getPassword());
+            String encodedPassword = passwordEncoder.getPasswordEncoder().encode(user.getPassword());
             user.setPassword(encodedPassword);
         }
         
@@ -215,7 +215,7 @@ public class UserServiceImpl implements UserService
     public User authenticateUser(String username, String password, HttpServletRequest request) throws Exception
     {
         User login = userRepository.findByEmail(username);
-        if (login == null)
+        if (login == null || !passwordEncoder.getPasswordEncoder().matches(password, login.getPassword()))
         {
             throw new AccessDeniedException("Login was not successful");
         }
