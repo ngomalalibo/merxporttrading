@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Pageable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
@@ -76,7 +75,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
         
         String imageID = "6126a4817f80646d7836a04f";
         user = userService.findUser("6126a4897f80646d7836a051");
-        commodity = new Commodity(faker.commerce().productName(), Collections.singletonList(faker.company().industry()), "Description2", new HashMap<>(), "QCDoc2", Collections.singletonList(imageID), new BigDecimal(100000), 1, "Bag", user, faker.country().name(), Scopes.INTERNATIONAL);
+        commodity = new Commodity(faker.commerce().productName(), Collections.singletonList(faker.company().industry()), "Description2", new HashMap<>(), "QCDoc2", Collections.singletonList(imageID), new BigDecimal(100000), 1, "Bag", user.getId(), faker.country().name(), Scopes.INTERNATIONAL);
     }
     
     
@@ -249,7 +248,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("scope", scope.name());
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{scope}/commodityByScope?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null,typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{scope}/commodityByScope?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
