@@ -41,7 +41,7 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
                                             faker.commerce().productName(), new HashMap<>(),
                                             faker.book().title(),
                                             Collections.singletonList(imageID),
-                                            new BigDecimal(100000), faker.number().numberBetween(1, 50), faker.stock().nsdqSymbol(), user,
+                                            new BigDecimal(100000), faker.number().numberBetween(1, 50), faker.stock().nsdqSymbol(), user.getId(),
                                             faker.country().name(),
                                             Scopes.INTERNATIONAL);
         Commodity save = commodityService.save(commodity);

@@ -37,7 +37,7 @@ public class Commodity extends PersistingBaseEntity
     private int quantity;
     private String unit;
     @BsonProperty(useDiscriminator = true)
-    private User seller;
+    private String sellerID;
     private String country;
     private Scopes scope;
 }
