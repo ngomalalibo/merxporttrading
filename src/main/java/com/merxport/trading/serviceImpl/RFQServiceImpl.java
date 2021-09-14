@@ -82,4 +82,10 @@ public class RFQServiceImpl implements RFQService
         
         return rfqs;*/
     }
+    
+    @Override
+    public PageableResponse findRFQByBuyer(String id, int page, int pageSize)
+    {
+        return findRFQs(Criteria.where("buyerID").is(id), true, page, pageSize);
+    }
 }

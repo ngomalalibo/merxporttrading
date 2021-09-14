@@ -39,6 +39,7 @@ public class RFQ extends PersistingBaseEntity
     private CommercialTerms term;
     private String location;
     private String quality;
+    private String buyerID;
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal minPrice;
     @Field(targetType = FieldType.DECIMAL128)

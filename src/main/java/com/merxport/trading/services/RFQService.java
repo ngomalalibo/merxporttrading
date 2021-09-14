@@ -17,4 +17,6 @@ public interface RFQService
     PageableResponse findRFQByCountry(String country, int page, int pageSize);
     
     PageableResponse findRFQByTerm(CommercialTerms term, int page, int pageSize);
+    
+    PageableResponse findRFQByBuyer(String id, int page, int pageSize);
 }

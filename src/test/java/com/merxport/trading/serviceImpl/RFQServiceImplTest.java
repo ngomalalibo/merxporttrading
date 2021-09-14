@@ -64,7 +64,7 @@ class RFQServiceImplTest extends AbstractIntegrationTest
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),
                        faker.number().numberBetween(99, 100), LocalDateTime.now(),
-                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", new BigDecimal(300000), new BigDecimal(350000));
+                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", "6126806273aade16270429c4", new BigDecimal(300000), new BigDecimal(350000));
     }
     
     
@@ -124,4 +124,15 @@ class RFQServiceImplTest extends AbstractIntegrationTest
         assertEquals(1, rfqs.size());
         assertEquals("COST_INSURANCE_AND_FREIGHT", rfqs.get(0).getTerm().name());
     }
+    
+    @Test
+    void findRFQByBuyerID()
+    {
+        String buyerID = "6126806273aade16270429c4";
+        PageableResponse pageableResponse = rfqService.findRFQByBuyer(buyerID, 0, 6);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertEquals(1, rfqs.size());
+        assertEquals("Enormous Silk Knife", rfqs.get(0).getTitle());
+    }
+    
 }

@@ -45,6 +45,12 @@ public class RFQController
         return ResponseEntity.ok(rfq);
     }
     
+    @GetMapping("/rfq/{buyerID}/buyer")
+    public ResponseEntity<PageableResponse> getRFQByBUyer(@PathVariable String buyerID, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    {
+        return ResponseEntity.ok(rfqService.findRFQByBuyer(buyerID, page, pageSize));
+    }
+    
     @GetMapping("/rfq/{id}/delete")
     public ResponseEntity<RFQ> deleteRFQ(@PathVariable String id, @RequestParam("token") String token) throws IOException
     {

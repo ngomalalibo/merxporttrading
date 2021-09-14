@@ -161,6 +161,23 @@ class RFQControllerTest extends AbstractIntegrationTest
         assertEquals("Gorgeous Granite Gloves", rfqs.get(0).getTitle());
     }
     
+    @Test
+    void findByBuyer()
+    {
+        String buyerID = "6126806273aade16270429c4";
+        Map<String, String> uriVars = new HashMap<>()
+        {{
+            put("buyerID", buyerID);
+        }};
+        ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfq/{buyerID}/buyer?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        PageableResponse pageableResponse = result.getBody();
+        assertNotNull(pageableResponse);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertNotNull(rfqs);
+        assertEquals(1, rfqs.size());
+        assertEquals("Enormous Silk Knife", rfqs.get(0).getTitle());
+    }
+    
     public RFQ getRFQ()
     {
         String imageID = "6126a4817f80646d7836a04f";
@@ -174,6 +191,6 @@ class RFQControllerTest extends AbstractIntegrationTest
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),
                        faker.number().numberBetween(99, 100), LocalDateTime.now(),
-                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", new BigDecimal(300000), new BigDecimal(350000));
+                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", "6126806273aade16270429c4", new BigDecimal(300000), new BigDecimal(350000));
     }
 }
