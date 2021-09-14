@@ -195,9 +195,9 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     {
         String message = ex.getClass().getSimpleName() + ": " + ex.getLocalizedMessage();
         ApiException apiResponse = new ApiException(
-                HttpStatus.FORBIDDEN, message, "Provide valid code/token");
+                HttpStatus.UNAUTHORIZED, message, "Provide valid user details");
         System.out.println(message);
-        return buildResponseEntity(apiResponse, HttpStatus.FORBIDDEN);
+        return buildResponseEntity(apiResponse, HttpStatus.UNAUTHORIZED);
     }
     
     @ExceptionHandler({RequestRejectedException.class})
