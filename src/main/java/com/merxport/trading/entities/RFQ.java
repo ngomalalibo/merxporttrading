@@ -4,6 +4,8 @@ import com.merxport.trading.enumerations.CommercialTerms;
 import com.merxport.trading.enumerations.RFQPriority;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
@@ -37,4 +39,8 @@ public class RFQ extends PersistingBaseEntity
     private CommercialTerms term;
     private String location;
     private String quality;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal minPrice;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal maxPrice;
 }

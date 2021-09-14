@@ -37,6 +37,14 @@ public class RFQController
         return ResponseEntity.ok(rfqService.save(rfq));
     }
     
+    @GetMapping("/rfq/{id}")
+    public ResponseEntity<RFQ> getRFQ(@PathVariable String id, @RequestParam("token") String token) throws IOException
+    {
+        RFQ rfq = rfqRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        rfq.setSessionUser(jwtTokenProvider.getUsername(token));
+        return ResponseEntity.ok(rfq);
+    }
+    
     @GetMapping("/rfq/{id}/delete")
     public ResponseEntity<RFQ> deleteRFQ(@PathVariable String id, @RequestParam("token") String token) throws IOException
     {

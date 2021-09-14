@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.AbstractIntegrationTest;
 import com.merxport.trading.entities.Commodity;
-import com.merxport.trading.entities.Quote;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.entities.Unit;
 import com.merxport.trading.enumerations.CommercialTerms;
@@ -64,6 +63,21 @@ class RFQControllerTest extends AbstractIntegrationTest
     }
     
     @Test
+    void getRFQById()
+    {
+        String id = "6140e084668a6a1f749c9f73";
+        Map<String, String> uriVars = new HashMap<>()
+        {{
+            put("id", id);
+        }};
+        ResponseEntity<RFQ> found = restTemplate.getForEntity("/api/rfq/{id}?token=" + AuthenticationController.TOKEN, RFQ.class, uriVars);
+        RFQ rfq = found.getBody();
+        assertNotNull(found);
+        assertNotNull(rfq);
+        assertEquals("Fantastic Granite Knife", rfq.getTitle());
+    }
+    
+    @Test
     void deleteRFQ()
     {
         String id = "6132233e12e8966bf50d04eb";
@@ -87,7 +101,7 @@ class RFQControllerTest extends AbstractIntegrationTest
             put("name", name);
         }};
         ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfqByCommodityName/{name}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
-    
+        
         PageableResponse pageableResponse = result.getBody();
         assertNotNull(pageableResponse);
         List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -160,6 +174,6 @@ class RFQControllerTest extends AbstractIntegrationTest
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),
                        faker.number().numberBetween(99, 100), LocalDateTime.now(),
-                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good");
+                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", new BigDecimal(300000), new BigDecimal(350000));
     }
 }

@@ -64,7 +64,7 @@ class RFQServiceImplTest extends AbstractIntegrationTest
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),
                        faker.number().numberBetween(99, 100), LocalDateTime.now(),
-                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good");
+                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", new BigDecimal(300000), new BigDecimal(350000));
     }
     
     
