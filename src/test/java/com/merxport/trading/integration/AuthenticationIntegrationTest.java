@@ -91,7 +91,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
     @Test
     void authenticate() throws Exception
     {
-        AuthenticationRequest authReq = new AuthenticationRequest("ngomalalibo@gmail.com", "password");
+        AuthenticationRequest authReq = new AuthenticationRequest("ngomalalibo@gmail.com", "pvasswordg");
         
         ResponseEntity<User> user = restTemplate.postForEntity("/auth", authReq, User.class);
         Assert.assertThrows("Duplicate Assert", DuplicateEntityException.class, () ->  {throw new DuplicateEntityException("Duplicate user. User exists!");});
