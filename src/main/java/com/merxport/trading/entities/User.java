@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,15 +23,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends PersistingBaseEntity
 {
-    @NotBlank(message = "First name is mandatory")
     private String firstName;
-    @NotBlank(message = "Last name is mandatory")
     private String lastName;
     private String middleName;
-    @NotBlank
     @Email(message = "Kindly provide a valid email")
     private String email;
-    @NotBlank
     private String password;
     private String phoneNo;
     private List<Address> address = new ArrayList<>();

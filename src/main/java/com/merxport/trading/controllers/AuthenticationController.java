@@ -59,6 +59,14 @@ public class AuthenticationController
         return ResponseEntity.ok(null);
     }
     
+    @GetMapping("/user/{id}/resetPassword/{username}")
+    public ResponseEntity<?> resetPassword(@PathVariable String id, @PathVariable String username) throws UnirestException
+    {
+        /*userService.resendCode(id);
+        return ResponseEntity.ok(null);*/
+        return null;
+    }
+    
     @GetMapping("/test/{name}")
     public ResponseEntity<String> dummy(@PathVariable String name)
     {

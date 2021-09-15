@@ -4,11 +4,13 @@ import com.merxport.trading.AbstractIntegrationTest;
 import com.merxport.trading.config.GenerateVerificationCode;
 import com.merxport.trading.entities.Address;
 import com.merxport.trading.entities.User;
-import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.Scopes;
+import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.UserType;
 import com.merxport.trading.exception.DuplicateEntityException;
 import com.merxport.trading.security.AuthenticationRequest;
+import com.merxport.trading.security.PasswordEncoder;
+import com.merxport.trading.services.UserService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +32,7 @@ import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,6 +41,12 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
 {
     @Autowired
     private GenerateVerificationCode generateVerificationCode;
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     @Test
     @DisplayName("should save file and then save user details")
@@ -71,9 +80,9 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
         
         User user = new User("Ngoo", "Alaliboo", "Martin", "ngomalalibo@yahoo.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID.getBody(), List.of(UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
         
-        ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("https://merxporttrading.herokuapp.com/user", user, User.class);
-        Assert.assertEquals(201, userResponseEntity.getStatusCode().value());
-        Assert.assertEquals(MediaType.APPLICATION_JSON, userResponseEntity.getHeaders().getContentType());
+        ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("/user", user, User.class);
+        assertEquals(201, userResponseEntity.getStatusCode().value());
+        assertEquals(MediaType.APPLICATION_JSON, userResponseEntity.getHeaders().getContentType());
         /*mockMvc.perform(MockMvcRequestBuilders.post("/user")
                                               .content(objectMapper.writeValueAsBytes(user)))
                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -89,22 +98,40 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
     }
     
     @Test
+    void updateUser() throws Exception
+    {
+        String email = "ngomalalibo@yahoo.com";
+        
+        User user = userService.findByEmail(email);
+        user.setFirstName("Ngo");
+        
+        ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("/user", user, User.class);
+        assertEquals(201, userResponseEntity.getStatusCode().value());
+        assertEquals(MediaType.APPLICATION_JSON, userResponseEntity.getHeaders().getContentType());
+        assertTrue(passwordEncoder.getPasswordEncoder().matches("password", user.getPassword()));
+    }
+    
+    
+    @Test
     void authenticate() throws Exception
     {
         AuthenticationRequest authReq = new AuthenticationRequest("ngomalalibo@gmail.com", "passwordg");
         
         ResponseEntity<User> user = restTemplate.postForEntity("/auth", authReq, User.class);
-        Assert.assertThrows("Duplicate Assert", DuplicateEntityException.class, () ->  {throw new DuplicateEntityException("Duplicate user. User exists!");});
-        Assert.assertEquals(200, user.getStatusCode().value());
-        Assert.assertEquals(MediaType.APPLICATION_JSON, user.getHeaders().getContentType());
-        Assert.assertEquals("Ngo", Objects.requireNonNull(user.getBody()).getFirstName());
+        Assert.assertThrows("Duplicate Assert", DuplicateEntityException.class, () ->
+        {
+            throw new DuplicateEntityException("Duplicate user. User exists!");
+        });
+        assertEquals(200, user.getStatusCode().value());
+        assertEquals(MediaType.APPLICATION_JSON, user.getHeaders().getContentType());
+        assertEquals("Ngo", Objects.requireNonNull(user.getBody()).getFirstName());
     }
     
     @Test
     void verifyUser() throws Exception
     {
-        String code = "161196";
-        String id = "613f30e50a472a0024e4393e";
+        String code = "465250";
+        String id = "614247e2570839112e28805b";
         Map<String, String> uriVars = new HashMap<>()
         {{
             put("id", id);
@@ -112,10 +139,11 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
             
         }};
         
-        User user = restTemplate.getForEntity("https://merxporttrading.herokuapp.com/user/verify/{id}/{code}", User.class, uriVars).getBody();
+        User user = restTemplate.getForEntity("/user/verify/{id}/{code}", User.class, uriVars).getBody();
         assertNotNull(user);
         assertTrue(user.isVerified());
     }
+    
     @Test
     void resendCode() throws Exception
     {
@@ -123,7 +151,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
         Map<String, String> uriVars = new HashMap<>()
         {{
             put("id", id);
-        
+            
         }};
         User user = restTemplate.getForEntity("/user/{id}/resendCode", User.class, uriVars).getBody();
     }

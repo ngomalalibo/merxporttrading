@@ -125,6 +125,7 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     
     public static void main(String[] args)
     {
-        System.out.println(new BigDecimal(40000).equals(new Decimal128(40000).bigDecimalValue()));
+        // System.out.println(new BigDecimal(40000).equals(new Decimal128(40000).bigDecimalValue()));
+        System.out.println(new CommodityServiceImplTest().faker.internet().password().substring(0,8));
     }
 }

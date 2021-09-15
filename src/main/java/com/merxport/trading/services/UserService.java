@@ -28,6 +28,8 @@ public interface UserService
     
     User addRoleToUser(String email, UserRole role);
     
+    String resetPassword(String id, String username);
+    
     void sendMessage();
     
     User verifyAccount(String id, String code);

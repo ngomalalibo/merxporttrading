@@ -87,7 +87,15 @@ public class UserServiceImpl implements UserService
     {
         if (!Strings.isNullOrEmpty(user.getPassword()))
         {
-            String encodedPassword = passwordEncoder.getPasswordEncoder().encode(user.getPassword());
+            String encodedPassword;
+            if (user.getId() == null)
+            {
+                encodedPassword = passwordEncoder.getPasswordEncoder().encode(user.getPassword());
+            }
+            else
+            {
+                encodedPassword = user.getPassword();
+            }
             user.setPassword(encodedPassword);
         }
         
@@ -141,6 +149,19 @@ public class UserServiceImpl implements UserService
             byEmail.getUserRoles().add(role);
         }
         return userRepository.save(byEmail);
+    }
+    
+    @Override
+    public String resetPassword(String id, String username)
+    {
+        User user = userRepository.findByEmail(username);
+        if (user == null)
+        {
+            throw new EntityNotFoundException("User does not exist");
+        }
+        
+        
+        return null;
     }
     
     
