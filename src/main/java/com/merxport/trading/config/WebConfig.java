@@ -4,6 +4,7 @@ import com.merxport.trading.email.SendMailMailGun;
 import com.merxport.trading.email.SendMail_Working;
 import com.merxport.trading.serviceImpl.DeleteServiceImpl;
 import com.merxport.trading.serviceImpl.FindServiceImpl;
+import com.merxport.trading.serviceImpl.UpdateEntityServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +42,12 @@ public class WebConfig extends WebMvcConfigurationSupport
     public DeleteServiceImpl deleteService()
     {
         return new DeleteServiceImpl();
+    }
+    
+    @Bean
+    public UpdateEntityServiceImpl updateService()
+    {
+        return new UpdateEntityServiceImpl();
     }
     
     @Bean

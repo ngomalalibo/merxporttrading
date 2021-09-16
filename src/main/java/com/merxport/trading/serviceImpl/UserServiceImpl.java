@@ -1,5 +1,6 @@
 package com.merxport.trading.serviceImpl;
 
+import com.github.javafaker.Faker;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -40,7 +41,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -76,7 +80,12 @@ public class UserServiceImpl implements UserService
     private DeleteServiceImpl deleteService;
     
     @Autowired
+    private UpdateEntityServiceImpl updateEntityService;
+    
+    @Autowired
     private UserService userService;
+    
+    protected final Faker faker = new Faker(Locale.getDefault());
     
     @Value("${pagination.page-size}")
     private int pageSize;
@@ -99,17 +108,24 @@ public class UserServiceImpl implements UserService
             user.setPassword(encodedPassword);
         }
         
-        String token = jwtTokenProvider.createToken(user);
-        user.setToken(token);
-        user.setVerificationPOJO(generateVerificationCode.verificationCode());
         User u = userRepository.findByEmail(user.getEmail());
         if (!Objects.isNull(u) && user.getId() == null)
         {
             throw new DuplicateEntityException("Duplicate user. User exists!");
         }
-        User saved = userRepository.save(user);
-        sendMail.sendMail(saved);
-        return saved;
+        
+        if (user.getId() == null)
+        {
+            String token = jwtTokenProvider.createToken(user);
+            user.setToken(token);
+            user.setVerificationPOJO(generateVerificationCode.verificationCode());
+            String line1 = "Verify your account using this verification code "
+                    + user.getVerificationPOJO().getVerificationCode() + ". It expires in 24 hrs at "
+                    + user.getVerificationPOJO().getCreationDateTime().plusDays(1).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd:MM:yyyy HH:mm:ss z")) + ".";
+            String subject = "Merxport - Account Verification";
+            sendMail.sendMail(user, subject, line1);
+        }
+        return userRepository.save(user);
     }
     
     /**
@@ -152,18 +168,39 @@ public class UserServiceImpl implements UserService
     }
     
     @Override
-    public String resetPassword(String id, String username)
+    public String resetPassword(String username) throws UnirestException
     {
         User user = userRepository.findByEmail(username);
         if (user == null)
         {
             throw new EntityNotFoundException("User does not exist");
         }
+        String password = faker.internet().password(6, 8, true);
+        updateEntityService.updateEntity(user, mongoTemplate, userRepository, "password", passwordEncoder.getPasswordEncoder().encode(password));
+        String subject = "Merxport - Reset Password";
+        // send email
+        String line1 = "Your new password is <strong>" + password + "</strong><br> Please endeavour to change it after login.";
+        sendMail.sendMail(user, subject, line1);
         
-        
-        return null;
+        return password;
     }
     
+    @Override
+    public String changePassword(String username, String oldPassword, String newPassword) throws UnirestException
+    {
+        User user = userService.findByEmail(username);
+        if (user == null)
+        {
+            throw new EntityNotFoundException("User does not exist");
+        }
+        if (passwordEncoder.getPasswordEncoder().matches(oldPassword, user.getPassword()))
+        {
+            user.setPassword(passwordEncoder.getPasswordEncoder().encode(newPassword));
+            updateEntityService.updateEntity(user, mongoTemplate, userRepository, "password", passwordEncoder.getPasswordEncoder().encode(newPassword));
+            return newPassword;
+        }
+        return null;
+    }
     
     @Override
     public String upload(MultipartFile file) throws IOException
@@ -337,7 +374,11 @@ public class UserServiceImpl implements UserService
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
         user.setVerificationPOJO(verificationPOJO);
         User saved = userRepository.save(user);
-        System.out.println(sendMail.sendMail(saved));
+        String line1 = "Verify your account using this verification code "
+                + user.getVerificationPOJO().getVerificationCode() + ". It expires in 24 hrs at "
+                + user.getVerificationPOJO().getCreationDateTime().plusDays(1).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd:MM:yyyy HH:mm:ss z")) + ".";
+        String subject = "Merxport - Account Verification";
+        System.out.println(sendMail.sendMail(saved, subject, line1));
     }
     
     /*@Loggable

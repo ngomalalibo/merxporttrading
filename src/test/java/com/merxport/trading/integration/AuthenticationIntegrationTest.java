@@ -18,10 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -47,6 +44,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
     
     @Test
     @DisplayName("should save file and then save user details")
@@ -102,20 +100,24 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
     {
         String email = "ngomalalibo@yahoo.com";
         
-        User user = userService.findByEmail(email);
-        user.setFirstName("Ngo");
+        final ParameterizedTypeReference<User> typeReference = new ParameterizedTypeReference<>()
+        {
+        };
         
-        ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("/user", user, User.class);
-        assertEquals(201, userResponseEntity.getStatusCode().value());
+        User user = userService.findByEmail(email);
+        user.setFirstName("Ngo Upd");
+        HttpEntity<User> requestEntity = new HttpEntity<>(user);
+        ResponseEntity<User> userResponseEntity = restTemplate.exchange("/user", HttpMethod.PUT, requestEntity, User.class, typeReference);
+        assertEquals(200, userResponseEntity.getStatusCode().value());
         assertEquals(MediaType.APPLICATION_JSON, userResponseEntity.getHeaders().getContentType());
-        assertTrue(passwordEncoder.getPasswordEncoder().matches("password", user.getPassword()));
+        assertTrue(passwordEncoder.getPasswordEncoder().matches("Password_1", user.getPassword()));
     }
     
     
     @Test
     void authenticate() throws Exception
     {
-        AuthenticationRequest authReq = new AuthenticationRequest("ngomalalibo@gmail.com", "passwordg");
+        AuthenticationRequest authReq = new AuthenticationRequest("ngomalalibo@gmail.com", "password");
         
         ResponseEntity<User> user = restTemplate.postForEntity("/auth", authReq, User.class);
         Assert.assertThrows("Duplicate Assert", DuplicateEntityException.class, () ->
@@ -151,8 +153,42 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
         Map<String, String> uriVars = new HashMap<>()
         {{
             put("id", id);
-            
         }};
         User user = restTemplate.getForEntity("/user/{id}/resendCode", User.class, uriVars).getBody();
+    }
+    
+    @Test
+    void resetPassword() throws Exception
+    {
+        String username = "ngomalalibo@yahoo.com";
+        Map<String, String> uriVars = new HashMap<>()
+        {{
+            put("username", username);
+        }};
+        String password = restTemplate.getForEntity("/user/resetPassword/{username}", String.class, uriVars).getBody();
+        System.out.println("Password: " + password);
+        User user = userService.findByEmail(username);
+        assertTrue(passwordEncoder.getPasswordEncoder().matches(password, user.getPassword()));
+    }
+    
+    @Test
+    void changePassword() throws Exception
+    {
+        String username = "ngomalalibo@yahoo.com";
+        String oldPass = "8Z&Mn5";
+        String newPass = "Password_1";
+        
+        Map<String, String> request = new HashMap<>()
+        {{
+            put("oldPassword", oldPass);
+            put("newPassword", newPass);
+        }};
+        Map<String, String> uriVars = new HashMap<>()
+        {{
+            put("username", username);
+        }};
+        String password = restTemplate.postForEntity("/user/changePassword/{username}", request, String.class, uriVars).getBody();
+        User user = userService.findByEmail(username);
+        assertTrue(passwordEncoder.getPasswordEncoder().matches(newPass, user.getPassword()));
     }
 }

@@ -50,25 +50,23 @@ public class SendMailMailGun
         }
     }
     
-    public ActionableEmail getMailInstance(User user)
+    public ActionableEmail getMailInstance(User user, String subject, String line1)
     {
         ActionableEmail mailObject = new ActionableEmail();
-        mailObject.setSubject("Merxport - Account Verification");
+        mailObject.setSubject(subject);
         mailObject.setToAddresses(user.getEmail());
         mailObject.setPersonName(user.getFirstName());
         mailObject.setFromAddresses(username != null ? username : "weblibrarianapp@gmail.com");
-        mailObject.setLine1(
-                "Verify your account using this verification code "
-                        + user.getVerificationPOJO().getVerificationCode() + ". It expires in 24 hrs at "
-                        + user.getVerificationPOJO().getCreationDateTime().plusDays(1).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd:MM:yyyy HH:mm:ss z")) + ".");
+        mailObject.setLine1(line1);
         mailObject.setMessage(populateTemplate(mailObject));
         
         return mailObject;
     }
     
-    public String sendMail(User user) throws UnirestException
+    public String sendMail(User user, String subject, String line1) throws UnirestException
     {
-        ActionableEmail mailInstance = getMailInstance(user);
+        
+        ActionableEmail mailInstance = getMailInstance(user, subject, line1);
         String mailHTML = populateTemplate(mailInstance);
         
         String response = sendSimpleMessage(mailInstance, mailHTML);
@@ -118,7 +116,11 @@ public class SendMailMailGun
             SendMailMailGun sendMail = new SendMailMailGun();
             User user = User.builder().firstName("Ngo").lastName("Alalibo").email("ngomalalibo@yahoo.com").password("password")
                             .isVerified(true).verificationPOJO(new VerificationPOJO("123456", LocalDateTime.now())).userRoles(List.of(UserRole.BUYER, UserRole.SELLER)).build();
-            sendMail.sendMail(user);
+            String line1 = "Verify your account using this verification code "
+                    + user.getVerificationPOJO().getVerificationCode() + ". It expires in 24 hrs at "
+                    + user.getVerificationPOJO().getCreationDateTime().plusDays(1).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd:MM:yyyy HH:mm:ss z")) + ".";
+            String subject = "Merxport - Account Verification";
+            sendMail.sendMail(user, subject, line1);
         }
         catch (Exception e)
         {

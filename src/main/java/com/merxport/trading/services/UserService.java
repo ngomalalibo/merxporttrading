@@ -28,7 +28,9 @@ public interface UserService
     
     User addRoleToUser(String email, UserRole role);
     
-    String resetPassword(String id, String username);
+    String resetPassword(String username) throws UnirestException;
+    
+    String changePassword(String id, String oldPassword, String newPassword) throws UnirestException;
     
     void sendMessage();
     

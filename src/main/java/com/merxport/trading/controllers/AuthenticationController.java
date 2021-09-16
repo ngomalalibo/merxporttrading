@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -59,12 +60,16 @@ public class AuthenticationController
         return ResponseEntity.ok(null);
     }
     
-    @GetMapping("/user/{id}/resetPassword/{username}")
-    public ResponseEntity<?> resetPassword(@PathVariable String id, @PathVariable String username) throws UnirestException
+    @GetMapping("/user/resetPassword/{username}")
+    public ResponseEntity<?> resetPassword(@PathVariable String username) throws UnirestException
     {
-        /*userService.resendCode(id);
-        return ResponseEntity.ok(null);*/
-        return null;
+        return ResponseEntity.ok(userService.resetPassword(username));
+    }
+    
+    @PostMapping("/user/changePassword/{username}")
+    public ResponseEntity<?> changePassword(@PathVariable String username, @RequestBody Map<String, String> passwords) throws UnirestException
+    {
+        return ResponseEntity.ok(userService.changePassword(username, passwords.get("oldPassword"), passwords.get("newPassword")));
     }
     
     @GetMapping("/test/{name}")
