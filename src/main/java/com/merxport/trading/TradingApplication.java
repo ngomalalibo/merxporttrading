@@ -25,6 +25,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories(basePackages = "com.merxport.trading.repositories")
 // @EnableMongoAuditing
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+// @SecurityScheme(name = "merxportapi", scheme = "bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 public class TradingApplication extends SpringBootServletInitializer
 {
     @Override

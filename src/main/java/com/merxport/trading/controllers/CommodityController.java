@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,19 +38,19 @@ public class CommodityController
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     
-    @Value("${pagination.page-size}")
-    private int pageSize;
+    // @Value("${pagination.page-size}")
+    // private int pageSize;
     
     @PostMapping("/commodity")
-    public ResponseEntity<Commodity> addCommodity(@Valid @RequestBody Commodity commodity, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<Commodity> addCommodity(@Valid @RequestBody Commodity commodity, HttpServletRequest req) throws IOException, ServletException
     {
-        commodity.setSessionUser(jwtTokenProvider.getUsername(token));
+        commodity.setSessionUser(jwtTokenProvider.getUsername(jwtTokenProvider.getTokenFromRequestHeader(req)));
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/commodity").toUriString());
         return ResponseEntity.created(uri).body(commodityService.save(commodity));
     }
     
     @GetMapping("/commodity/{id}")
-    public ResponseEntity<Commodity> getCommodity(@PathVariable String id, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<Commodity> getCommodity(@PathVariable String id) throws IOException
     {
         Commodity commodity = commodityRepository.findById(id).orElseThrow(() ->
                                                                            {
@@ -58,14 +60,14 @@ public class CommodityController
     }
     
     @PutMapping("/commodity")
-    public ResponseEntity<Commodity> updateCommodity(@Valid @RequestBody Commodity commodity, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<Commodity> updateCommodity(@Valid @RequestBody Commodity commodity, HttpServletRequest req) throws IOException, ServletException
     {
-        commodity.setSessionUser(jwtTokenProvider.getUsername(token));
+        commodity.setSessionUser(jwtTokenProvider.getUsername(jwtTokenProvider.getTokenFromRequestHeader(req)));
         return ResponseEntity.ok(commodityService.save(commodity));
     }
     
     @GetMapping("/commodities/{name}")
-    public ResponseEntity<PageableResponse> getCommoditiesByName(@PathVariable(required = false) String name, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    public ResponseEntity<PageableResponse> getCommoditiesByName(@PathVariable(required = false) String name, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findByNameLikeOrderByNameAsc(name, page, pageSize));
         // Page<Commodity> byNameLikeOrderByNameAsc = commodityRepository.findByNameLikeOrderByNameAsc(name, Sort.by(Sort.Direction.ASC, "name"), PageRequest.of(page, pageSize));
@@ -73,57 +75,57 @@ public class CommodityController
     }
     
     @GetMapping("/commodity/{id}/delete")
-    public ResponseEntity<Commodity> deleteCommodity(@PathVariable String id, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<Commodity> deleteCommodity(@PathVariable String id, HttpServletRequest req) throws IOException, ServletException
     {
         Commodity commodity = commodityRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Commodity not found."));
-        commodity.setSessionUser(jwtTokenProvider.getUsername(token));
+        commodity.setSessionUser(jwtTokenProvider.getUsername(jwtTokenProvider.getTokenFromRequestHeader(req)));
         return ResponseEntity.ok(commodityService.delete(commodity));
     }
     
     @GetMapping("/{search}/commoditySearch")
-    public ResponseEntity<PageableResponse> getCommoditiesSearch(@PathVariable String search, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    public ResponseEntity<PageableResponse> getCommoditiesSearch(@PathVariable String search, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findByNameLikeOrDescriptionLikeOrCategoryLikeOrderByNameAsc(search, page, pageSize));
     }
     
     @GetMapping("/{category}/commodityByCategory")
-    ResponseEntity<PageableResponse> findCommodityByCategoryLike(@PathVariable String category, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommodityByCategoryLike(@PathVariable String category, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommodityByCategoryLike(category, page, pageSize));
     }
     
     @GetMapping("/{country}/commodityByCountry")
-    ResponseEntity<PageableResponse> findCommodityByCountry(@PathVariable String country, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommodityByCountry(@PathVariable String country, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommodityByCountry(country, page, pageSize));
     }
     
     @GetMapping("/{amount}/commodityGreaterThan")
-    ResponseEntity<PageableResponse> findCommodityByAmountGreaterThan(@PathVariable BigDecimal amount, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommodityByAmountGreaterThan(@PathVariable BigDecimal amount, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommodityByAmountGreaterThan(amount, page, pageSize));
     }
     
     @GetMapping("/{amount}/commodityLessThan")
-    ResponseEntity<PageableResponse> findCommodityByAmountLessThan(@PathVariable BigDecimal amount, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommodityByAmountLessThan(@PathVariable BigDecimal amount, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommodityByAmountLessThan(amount, page, pageSize));
     }
     
     @GetMapping("/{scope}/commodityByScope")
-    ResponseEntity<PageableResponse> findCommodityByScope(@PathVariable Scopes scope, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommodityByScope(@PathVariable Scopes scope, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommodityByScope(scope, page, pageSize));
     }
     
     @GetMapping("/{sellerID}/commodityBySeller")
-    ResponseEntity<PageableResponse> findCommodityBySeller(@PathVariable String sellerID, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommodityBySeller(@PathVariable String sellerID, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommodityBySeller(userService.findUser(sellerID), page, pageSize));
     }
     
     @PostMapping("/commodityMultiSearch")
-    ResponseEntity<PageableResponse> findCommoditySearch(@RequestBody CommodityRequest request, @RequestParam("token") String token, @RequestParam("page") int page) throws IOException
+    ResponseEntity<PageableResponse> findCommoditySearch(@RequestBody CommodityRequest request, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
     {
         return ResponseEntity.ok(commodityService.findCommoditySearch(request.getCountry(), request.getCategory(), request.getAmount(), Scopes.fromValue(request.getScope()), page, pageSize));
     }

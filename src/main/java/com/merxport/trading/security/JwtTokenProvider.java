@@ -14,7 +14,10 @@ import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
@@ -127,7 +130,7 @@ public class JwtTokenProvider
         
     }
     
-    private String extractJwtFromRequest(HttpServletRequest request)
+    private String extractJwtFromRequestParam(HttpServletRequest request)
     {
         String token = request.getParameter("token");
         if (token != null && validateToken(token))
@@ -140,11 +143,27 @@ public class JwtTokenProvider
         {
             return bearerToken.substring(7, bearerToken.length());
         }*/
-        return null;
+        return token;
     }
     
     public Claims extractAllClaims(String token)
     {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
+    
+    public String getTokenFromRequestHeader(HttpServletRequest request) throws ServletException, IOException
+    {
+        String token = null;
+        final String authorizationHeaderValue = request.getHeader("Authorization");
+        if (authorizationHeaderValue != null && authorizationHeaderValue.startsWith("Bearer "))
+        {
+            token = authorizationHeaderValue.substring(7);
+            
+        }
+        if (token == null)
+        {
+            throw new AccessDeniedException("Provide a valid token");
+        }
+        return token;
     }
 }

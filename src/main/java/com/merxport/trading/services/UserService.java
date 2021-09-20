@@ -43,4 +43,6 @@ public interface UserService
     User authenticateUser(String username, String password, HttpServletRequest request) throws Exception;
     
     String upload(MultipartFile file) throws IOException;
+    
+    String getImage(String imageID, int width, int height, String format) throws Exception;
 }

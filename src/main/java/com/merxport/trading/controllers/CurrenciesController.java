@@ -16,7 +16,7 @@ public class CurrenciesController
     private CurrencyService currencyService;
     
     @GetMapping("/currency/{code}")
-    public Currency getCurrency(@PathVariable String code, @RequestParam("token") String token)
+    public Currency getCurrency(@PathVariable String code)
     {
         return currencyService.getCurrency(code);
     }

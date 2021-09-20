@@ -19,7 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
@@ -131,7 +133,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
         {{
             put("name", name);
         }};
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodities/{name}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodities/{name}?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -147,7 +149,11 @@ class CommodityControllerTest extends AbstractIntegrationTest
         {{
             put("search", search);
         }};
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{search}/commoditySearch?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+AuthenticationController.TOKEN);
+        final HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
+        
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{search}/commoditySearch?page=1&pageSize=6", HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -180,7 +186,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("category", category);
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{category}/commodityByCategory?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{category}/commodityByCategory?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -197,7 +203,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("country", country);
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{country}/commodityByCountry?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{country}/commodityByCountry?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -214,7 +220,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("amount", amount);
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{amount}/commodityGreaterThan?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{amount}/commodityGreaterThan?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -231,7 +237,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("amount", amount);
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{amount}/commodityLessThan?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{amount}/commodityLessThan?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -248,7 +254,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("scope", scope.name());
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{scope}/commodityByScope?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{scope}/commodityByScope?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -267,7 +273,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
             put("sellerID", user.getId());
         }};
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{sellerID}/commodityBySeller?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/{sellerID}/commodityBySeller?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, uriVars);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -280,7 +286,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
     {
         CommodityRequest cr = new CommodityRequest("Iceland", Scopes.INTERNATIONAL.name(), new BigDecimal(40000), "Services");
         HttpEntity<CommodityRequest> requestEntity = new HttpEntity<>(cr);
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodityMultiSearch?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.POST, requestEntity, typeReference, cr);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodityMultiSearch?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.POST, requestEntity, typeReference, cr);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);

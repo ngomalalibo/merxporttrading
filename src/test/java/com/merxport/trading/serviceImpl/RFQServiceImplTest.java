@@ -3,7 +3,6 @@ package com.merxport.trading.serviceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.AbstractIntegrationTest;
-import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.entities.Unit;
 import com.merxport.trading.enumerations.CommercialTerms;
@@ -58,13 +57,13 @@ class RFQServiceImplTest extends AbstractIntegrationTest
         Unit unit = unitRepository.findById(unitID).orElseThrow(EntityNotFoundException::new);
         Currency naira = Currency.getInstance("NGN");
         return new RFQ(faker.commerce().productName(),
-                       commodityRepository.findById("6130ff9f4ed20e41b43a503c").orElse(new Commodity()),
+                       "6130ff9f4ed20e41b43a503c",
                        new BigDecimal(20000), unit.getSingularName(),
                        faker.number().numberBetween(1, 100),
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),
                        faker.number().numberBetween(99, 100), LocalDateTime.now(),
-                       naira, imageID, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", "6126806273aade16270429c4", new BigDecimal(300000), new BigDecimal(350000));
+                       naira, imageID, null, "Nigeria", CommercialTerms.COST_INSURANCE_AND_FREIGHT, "Lagos", "Good", "6126806273aade16270429c4", new BigDecimal(300000), new BigDecimal(350000));
     }
     
     
@@ -102,7 +101,7 @@ class RFQServiceImplTest extends AbstractIntegrationTest
         PageableResponse pageableResponse = rfqService.findRFQByCommodityNameLike(name, 0, 6);
         List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertEquals(1, rfqs.size());
-        assertEquals("Ergonomic Cotton Lamp", rfqs.get(0).getCommodity().getName());
+        assertEquals("6130ff9f4ed20e41b43a503c", rfqs.get(0).getCommodityID());
     }
     
     @Test

@@ -26,15 +26,13 @@ public class JwtTokenFilter extends OncePerRequestFilter
     
     public static final String[] FILTER_WHITELIST = {
             // -- Swagger UI v2
-            "/", "/user", "/auth", "/test/", "/upload", "/user/verify/",
+            "/user", "/auth", "/test/", "/upload", "/getImage", "/user/verify/",
             "/api-docs",
             "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars",
+            "/configuration/**",
+            "/configuration*/**",
+            "/swagger*/**",
+            "/webjars/**",
             // -- Swagger UI v3 (OpenAPI)
             "/v3/api-docs",
             "/swagger-ui"
@@ -50,10 +48,10 @@ public class JwtTokenFilter extends OncePerRequestFilter
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException
     {
-        String requestURI = request.getRequestURI();
+        String requestURI = request.getRequestURI().toLowerCase();
         for (String uri : FILTER_WHITELIST)
         {
-            if (requestURI.startsWith(uri))
+            if (requestURI.startsWith(uri.toLowerCase()))
             {
                 log.info("Excluding {} from filter", requestURI);
                 return true;
@@ -65,10 +63,10 @@ public class JwtTokenFilter extends OncePerRequestFilter
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException
     {
-        System.out.println("In filter>>>>>>>>>>>>");
+        // System.out.println("In filter>>>>>>>>>>>>");
+        String token = jwtTokenProvider.getTokenFromRequestHeader(req);
         
-        String token = req.getParameter("token");
-        if (token != null && jwtTokenProvider.validateToken(token) && SecurityContextHolder.getContext().getAuthentication() == null)
+        if (jwtTokenProvider.validateToken(token) && SecurityContextHolder.getContext().getAuthentication() == null)
         {
             Authentication auth = jwtTokenProvider.getAuthentication(token, req);
             SecurityContextHolder.getContext().setAuthentication(auth);
@@ -81,4 +79,6 @@ public class JwtTokenFilter extends OncePerRequestFilter
         // HttpServletRequest httpServletRequest = HttpServletRequest.class.cast(servletRequest);
         filterChain.doFilter(req, res);
     }
+    
+    
 }

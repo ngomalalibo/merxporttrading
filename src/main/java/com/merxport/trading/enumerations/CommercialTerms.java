@@ -64,4 +64,9 @@ public enum CommercialTerms
         }
         throw new IllegalArgumentException(v);
     }
+    
+    public static void main(String[] args)
+    {
+       Arrays.asList(CommercialTerms.values()).forEach(d -> System.out.println(d.name()));
+    }
 }

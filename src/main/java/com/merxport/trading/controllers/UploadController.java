@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,7 +14,6 @@ import java.io.IOException;
 import java.net.URI;
 
 @RestController
-@RequestMapping("")
 public class UploadController
 {
     @Autowired
@@ -33,6 +29,16 @@ public class UploadController
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/upload").toUriString());
         return ResponseEntity.created(uri).body(userService.upload(file));
     }
+    
+    @GetMapping("/getImage/{id}")
+    public ResponseEntity<String> getImage(@PathVariable String id,
+                                           @RequestParam(value = "width", required = false, defaultValue = "0") int width,
+                                           @RequestParam(value = "height", required = false, defaultValue = "0") int height,
+                                           @RequestParam(value = "format", required = false, defaultValue = "JPEG") String format) throws Exception
+    {
+        return ResponseEntity.ok(userService.getImage(id, width, height, format));
+    }
+    
     
     /*@PostMapping(value = "/user", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<User> addUser(@RequestParam("user") String user, @RequestParam("file") MultipartFile file) throws IOException

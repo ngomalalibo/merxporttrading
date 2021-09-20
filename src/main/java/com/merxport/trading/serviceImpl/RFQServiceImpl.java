@@ -1,5 +1,7 @@
 package com.merxport.trading.serviceImpl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.aspect.Loggable;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.enumerations.CommercialTerms;
@@ -12,6 +14,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RFQServiceImpl implements RFQService
@@ -28,6 +34,17 @@ public class RFQServiceImpl implements RFQService
     
     @Autowired
     private FindServiceImpl findService;
+    
+    @Qualifier("getObjectMapper")
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    @Autowired
+    protected RestTemplate restTemplate;
+    
+    private TypeReference<List<RFQ>> typeReferenceList = new TypeReference<>()
+    {
+    };
     
     @Loggable
     @Override
@@ -69,7 +86,14 @@ public class RFQServiceImpl implements RFQService
     
     public PageableResponse findRFQs(Criteria criteria, boolean isActive, int page, int pageSize)
     {
-        return findService.find(new RFQ(), "rfqs", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
+        /**populate rfq with image from image id*/
+        PageableResponse pageableResponse = findService.find(new RFQ(), "rfqs", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
+        List<RFQ> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList)
+                                             .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("/getImage/{id}", String.class, rfq.getId()).getBody())).collect(Collectors.toList());
+        pageableResponse.setResponseBody(responseBody);
+        return pageableResponse;
+        /**return rfq with image id*/
+        // return findService.find(new RFQ(), "rfqs", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
         /*AggregationOperation operation = Aggregation.match(criteria);
         AggregationOperation operationActive = Aggregation.match(Criteria.where("isActive").is(isActive));
         List<AggregationOperation> aggPipeline = new ArrayList<>();

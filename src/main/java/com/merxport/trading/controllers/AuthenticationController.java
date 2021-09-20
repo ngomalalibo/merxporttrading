@@ -4,6 +4,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.security.AuthenticationRequest;
 import com.merxport.trading.services.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+// @SecurityRequirement(name = "merxportapi")
 public class AuthenticationController
 {
     @Autowired

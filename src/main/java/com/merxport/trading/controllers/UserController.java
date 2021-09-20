@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class UserController
     private JwtTokenProvider jwtTokenProvider;
     
     @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUser(@PathVariable String id, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<User> getUser(@PathVariable String id) throws IOException
     {
         return ResponseEntity.ok(userService.findUser(id));
         
@@ -35,10 +37,10 @@ public class UserController
     }
     
     @GetMapping("/user/delete/{id}")// archive user data
-    public ResponseEntity<User> deleteUser(@PathVariable String id, @RequestParam("token") String token) throws IOException
+    public ResponseEntity<User> deleteUser(@PathVariable String id, HttpServletRequest req) throws IOException, ServletException
     {
         User user = userService.findUser(id);
-        user.setSessionUser(jwtTokenProvider.getUsername(token));
+        user.setSessionUser(jwtTokenProvider.getUsername(jwtTokenProvider.getTokenFromRequestHeader(req)));
         return ResponseEntity.ok(userService.deleteUser(user));
     }
     

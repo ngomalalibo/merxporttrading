@@ -132,4 +132,12 @@ class UserServiceImplTest
     void setScope()
     {
     }
+    
+    @Test
+    void getImage() throws Exception
+    {
+        String imageID = "6126a4817f80646d7836a04f";
+        String image = userService.getImage(imageID, 300, 300, "JPEG");
+        System.out.println(image);
+    }
 }

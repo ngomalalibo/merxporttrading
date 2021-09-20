@@ -101,7 +101,7 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getQuotes()
     {
-        ResponseEntity<List<Quote>> response = restTemplate.exchange("/api/quotes?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, paramTypeReference);
+        ResponseEntity<List<Quote>> response = restTemplate.exchange("/api/quotes?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, paramTypeReference);
         List<Quote> responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals(2, responseBody.size());
@@ -110,7 +110,7 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getQuotesActive()
     {
-        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesActive?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference);
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesActive?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference);
         PageableResponse pageableResponse = getQuotes.getBody();
         assertNotNull(pageableResponse);
         List<Quote> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
@@ -121,7 +121,7 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getQuoteByRFQ()
     {
-        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quoteByRFQ/{id}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6132233e12e8966bf50d04eb");
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quoteByRFQ/{id}?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6132233e12e8966bf50d04eb");
         PageableResponse pageableResponse = getQuotes.getBody();
         assertNotNull(pageableResponse);
         
@@ -143,7 +143,7 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getAcceptedQuotesBySeller()
     {
-        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesAcceptedBySeller/{sellerID}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesAcceptedBySeller/{sellerID}?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
         PageableResponse pageable = getQuotes.getBody();
         assertNotNull(pageable);
         List<Quote> responseBody = objectMapper.convertValue(pageable.getResponseBody(), typeReferenceList);
@@ -155,7 +155,7 @@ class QuoteControllerTest extends AbstractIntegrationTest
     @Test
     void getAllQuotesBySeller()
     {
-        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesAllBySeller/{sellerID}?page=0&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
+        ResponseEntity<PageableResponse> getQuotes = restTemplate.exchange("/api/quotesAllBySeller/{sellerID}?page=1&pageSize=6&token=" + AuthenticationController.TOKEN, HttpMethod.GET, null, typeReference, "6126806273aade16270429c4");
         PageableResponse pageable = getQuotes.getBody();
         assertNotNull(pageable);
         List<Quote> responseBody = objectMapper.convertValue(pageable.getResponseBody(), typeReferenceList);

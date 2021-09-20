@@ -59,7 +59,8 @@ public class FindServiceImpl
         }
         
         aggPipeline = new LinkedList<>();
-        AggregationOperation operationOffset = Aggregation.skip(page * pageSize);
+        long offset = page == 1 ? 0 : page * pageSize;
+        AggregationOperation operationOffset = Aggregation.skip(offset);
         AggregationOperation operationLimit = Aggregation.limit(pageSize);
         AggregationOperation operationSort = Aggregation.sort(sort);
         aggPipeline.add(operation);

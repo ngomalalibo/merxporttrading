@@ -190,6 +190,19 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return buildResponseEntity(apiResponse, HttpStatus.BAD_REQUEST);
     }
     
+    @ExceptionHandler({IllegalArgumentException.class})
+    protected ResponseEntity<Object> handleIllegalArgumentException(
+            IllegalArgumentException ex, HttpHeaders headers,
+            HttpStatus status, WebRequest request)
+    {
+        String message = ex.getLocalizedMessage();
+        ApiException apiResponse =
+                new ApiException(HttpStatus.BAD_REQUEST, message, message);
+        System.out.println(message);
+        return buildResponseEntity(apiResponse, HttpStatus.BAD_REQUEST);
+    }
+    
+    
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex)
     {

@@ -18,17 +18,22 @@ import com.merxport.trading.security.JwtTokenProvider;
 import com.merxport.trading.security.PasswordEncoder;
 import com.merxport.trading.security.VerificationPOJO;
 import com.merxport.trading.services.UserService;
+import com.merxport.trading.util.ImageUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.result.UpdateResult;
+import org.apache.commons.io.IOUtils;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -37,15 +42,22 @@ import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImpl implements UserService
@@ -59,6 +71,9 @@ public class UserServiceImpl implements UserService
     
     @Autowired
     private GridFsTemplate gridFsTemplate;
+    
+    @Autowired
+    private GridFsOperations operations;
     
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -87,8 +102,8 @@ public class UserServiceImpl implements UserService
     
     protected final Faker faker = new Faker(Locale.getDefault());
     
-    @Value("${pagination.page-size}")
-    private int pageSize;
+    @Autowired
+    private ImageUtil imageUtil;
     
     @Loggable
     @Override
@@ -208,9 +223,13 @@ public class UserServiceImpl implements UserService
         if (!Objects.isNull(file))
         {
             // Get image metadata
+            BufferedImage image = ImageIO.read(file.getInputStream());
             DBObject metadata = new BasicDBObject();
             metadata.put("fileSize", file.getSize());
             metadata.put("fileName", file.getOriginalFilename());
+            metadata.put("fileWidth", image.getWidth());
+            metadata.put("fileHeight", image.getHeight());
+            
             
             // store file in gridfs mongo
             // return fileID in user object for retrieval purpose
@@ -218,6 +237,39 @@ public class UserServiceImpl implements UserService
         }
         // save use and return
         return null;
+    }
+    
+    
+    @Override
+    public String getImage(String imageID, int width, int height, String format) throws Exception
+    {
+        GridFSFile image = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(imageID)));
+        assert image != null;
+        if (width == 0 || height == 0)
+        {
+            assert image.getMetadata() != null;
+            width = image.getMetadata().get("fileWidth")!=null? (int) image.getMetadata().get("fileWidth") : 200;
+            height = image.getMetadata().get("fileHeight")!=null? (int) image.getMetadata().get("fileWidth") : 200;
+        }
+        String regex = "(((?i)(jpe?g|png|gif|bmp|wbmp))$)";
+        Pattern p = Pattern.compile(regex);
+        
+        Matcher m = p.matcher(format);
+        if (!m.matches())
+        {
+            throw new IllegalArgumentException("Provide a valid image format");
+        }
+        
+        byte[] imageBytes = IOUtils.toByteArray(operations.getResource(image).getInputStream());
+    
+        InputStream is = new ByteArrayInputStream(imageBytes);
+        BufferedImage newBi = ImageIO.read(is);
+        newBi = imageUtil.resizeImage(newBi, width, height);
+        
+        //BufferedImage newBi = imageUtil.createRGBImage(imageBytes, width, height);
+        
+        Binary binary = new Binary(BsonBinarySubType.BINARY, imageUtil.toByteArray(newBi, format));
+        return "data:image/png;base64," + Base64.getEncoder().encodeToString(binary.getData());
     }
     
     /*@Transactional
@@ -438,4 +490,6 @@ public class UserServiceImpl implements UserService
     {
     
     }
+    
+    
 }
