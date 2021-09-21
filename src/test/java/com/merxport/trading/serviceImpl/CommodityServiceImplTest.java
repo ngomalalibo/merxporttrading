@@ -32,10 +32,10 @@ class CommodityServiceImplTest extends AbstractIntegrationTest
     };
     
     @Test
-    void save() throws IOException
+    void save() throws Exception
     {
         String imageID = "6126a4817f80646d7836a04f";
-        User user = userService.findUser("6126a4897f80646d7836a051");
+        User user = userService.findByID("6126a4897f80646d7836a051");
         Commodity commodity = new Commodity(faker.commerce().productName(),
                                             Collections.singletonList(faker.company().industry()),
                                             faker.commerce().productName(), new HashMap<>(),

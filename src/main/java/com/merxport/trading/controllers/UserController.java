@@ -24,9 +24,9 @@ public class UserController
     private JwtTokenProvider jwtTokenProvider;
     
     @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUser(@PathVariable String id) throws IOException
+    public ResponseEntity<User> getUser(@PathVariable String id) throws Exception
     {
-        return ResponseEntity.ok(userService.findUser(id));
+        return ResponseEntity.ok(userService.findByID(id));
         
     }
     
@@ -37,9 +37,9 @@ public class UserController
     }
     
     @GetMapping("/user/delete/{id}")// archive user data
-    public ResponseEntity<User> deleteUser(@PathVariable String id, HttpServletRequest req) throws IOException, ServletException
+    public ResponseEntity<User> deleteUser(@PathVariable String id, HttpServletRequest req) throws Exception
     {
-        User user = userService.findUser(id);
+        User user = userService.findByID(id);
         user.setSessionUser(jwtTokenProvider.getUsername(jwtTokenProvider.getTokenFromRequestHeader(req)));
         return ResponseEntity.ok(userService.deleteUser(user));
     }

@@ -119,9 +119,9 @@ public class CommodityController
     }
     
     @GetMapping("/{sellerID}/commodityBySeller")
-    ResponseEntity<PageableResponse> findCommodityBySeller(@PathVariable String sellerID, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
+    ResponseEntity<PageableResponse> findCommodityBySeller(@PathVariable String sellerID, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws Exception
     {
-        return ResponseEntity.ok(commodityService.findCommodityBySeller(userService.findUser(sellerID), page, pageSize));
+        return ResponseEntity.ok(commodityService.findCommodityBySeller(userService.findByID(sellerID), page, pageSize));
     }
     
     @PostMapping("/commodityMultiSearch")

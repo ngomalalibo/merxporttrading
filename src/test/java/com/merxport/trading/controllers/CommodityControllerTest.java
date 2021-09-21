@@ -75,7 +75,7 @@ class CommodityControllerTest extends AbstractIntegrationTest
         //user = userService.save(user);
         
         String imageID = "6126a4817f80646d7836a04f";
-        user = userService.findUser("6126a4897f80646d7836a051");
+        user = userService.findByID("6126a4897f80646d7836a051");
         commodity = new Commodity(faker.commerce().productName(), Collections.singletonList(faker.company().industry()), "Description2", new HashMap<>(), "QCDoc2", Collections.singletonList(imageID), new BigDecimal(100000), 1, "Bag", user.getId(), faker.country().name(), Scopes.INTERNATIONAL);
     }
     

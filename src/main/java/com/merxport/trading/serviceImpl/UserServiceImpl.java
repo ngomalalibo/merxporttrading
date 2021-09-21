@@ -318,24 +318,11 @@ public class UserServiceImpl implements UserService
     }
     
     @Override
-    public User findByID(String id) throws IOException
+    public User findByID(String id) throws Exception
     {
         User user = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        try
-        {
-            user.setImage(userService.getImage(user.getImageID(), 0, 0, null));
-            return user;
-        }
-        catch (Exception e)
-        {
-            throw new EntityNotFoundException("User not found");
-        }
-    }
-    
-    @Override
-    public User findUser(String id) throws IOException
-    {
-        return userRepository.findById(id).orElse(null);
+        user.setImage(userService.getImage(user.getImageID(), 0, 0, null));
+        return user;
     }
     
     @Override

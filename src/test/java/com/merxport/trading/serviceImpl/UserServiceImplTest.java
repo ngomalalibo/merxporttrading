@@ -75,10 +75,10 @@ class UserServiceImplTest extends AbstractIntegrationTest
     }
     
     @Test
-    void deleteUser() throws IOException
+    void deleteUser() throws Exception
     {
         String id = "6122e74dcdab19483bdce58a";
-        User user = userService.deleteUser(userService.findUser(id));
+        User user = userService.deleteUser(userService.findByID(id));
         
         System.out.println("Test Method: " + user.isActive());
         System.out.println("Arch Date: " + user.getAudit().getArchivedDate());
@@ -91,10 +91,10 @@ class UserServiceImplTest extends AbstractIntegrationTest
     }
     
     @Test
-    void findUser() throws IOException
+    void findUser() throws Exception
     {
         String id = "6126806273aade16270429c4";
-        User user = userService.findUser(id);
+        User user = userService.findByID(id);
         
         assertNotNull(user);
         

@@ -14,9 +14,7 @@ public interface UserService
 {
     User save(User user) throws UnirestException;
     
-    User findUser(String id) throws IOException;
-    
-    User findByID(String id) throws IOException;
+    User findByID(String id) throws IOException, Exception;
     
     void resendCode(String id) throws UnirestException;
     
