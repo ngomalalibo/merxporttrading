@@ -244,12 +244,13 @@ public class UserServiceImpl implements UserService
     public String getImage(String imageID, int width, int height, String format) throws Exception
     {
         GridFSFile image = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(imageID)));
+        format = format == null ? "JPEG" : format;
         assert image != null;
         if (width == 0 || height == 0)
         {
             assert image.getMetadata() != null;
-            width = image.getMetadata().get("fileWidth")!=null? (int) image.getMetadata().get("fileWidth") : 200;
-            height = image.getMetadata().get("fileHeight")!=null? (int) image.getMetadata().get("fileWidth") : 200;
+            width = image.getMetadata().get("fileWidth") != null ? (int) image.getMetadata().get("fileWidth") : 200;
+            height = image.getMetadata().get("fileHeight") != null ? (int) image.getMetadata().get("fileWidth") : 200;
         }
         String regex = "(((?i)(jpe?g|png|gif|bmp|wbmp))$)";
         Pattern p = Pattern.compile(regex);
@@ -261,7 +262,7 @@ public class UserServiceImpl implements UserService
         }
         
         byte[] imageBytes = IOUtils.toByteArray(operations.getResource(image).getInputStream());
-    
+        
         InputStream is = new ByteArrayInputStream(imageBytes);
         BufferedImage newBi = ImageIO.read(is);
         newBi = imageUtil.resizeImage(newBi, width, height);

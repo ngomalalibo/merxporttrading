@@ -9,6 +9,7 @@ import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.repositories.RFQRepository;
 import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.RFQService;
+import com.merxport.trading.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
@@ -40,8 +41,8 @@ public class RFQServiceImpl implements RFQService
     @Autowired
     private ObjectMapper objectMapper;
     
-    @Autowired
-    protected RestTemplate restTemplate;
+   @Autowired
+    private UserService userService;
     
     private TypeReference<List<RFQ>> typeReferenceList = new TypeReference<>()
     {
@@ -89,8 +90,16 @@ public class RFQServiceImpl implements RFQService
     public RFQ findByID(String id)
     {
         RFQ rfq = rfqRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        rfq.setSampleImage(restTemplate.getForEntity("/getImage/{id}", String.class, rfq.getSampleImageID()).getBody());
-        return rfq;
+        
+        try
+        {
+            rfq.setSampleImage(userService.getImage(rfq.getSampleImageID(), 0, 0, "JPEG"));
+            return rfq;
+        }
+        catch (Exception ex)
+        {
+            throw new EntityNotFoundException("RFQ not found");
+        }
     }
     
     public PageableResponse findRFQs(Criteria criteria, boolean isActive, int page, int pageSize)
@@ -98,7 +107,18 @@ public class RFQServiceImpl implements RFQService
         /**populate rfq with image from image id*/
         PageableResponse pageableResponse = findService.find(new RFQ(), "rfqs", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
         List<RFQ> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList)
-                                             .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("https://merxporttrading.herokuapp.com/getImage/{id}", String.class, rfq.getSampleImageID()).getBody())).collect(Collectors.toList());
+                                             .stream().peek(rfq ->
+                                                            {
+                                                                try
+                                                                {
+                                                                    rfq.setSampleImage(userService.getImage(rfq.getSampleImageID(), 0, 0, "JPEG"));
+                                                                }
+                                                                catch (Exception ex)
+                                                                {
+                                                                    throw new EntityNotFoundException("RFQ not found");
+                                                                }
+                                                            }).collect(Collectors.toList());
+        // .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("https://merxporttrading.herokuapp.com/getImage/{id}", String.class, rfq.getSampleImageID()).getBody())).collect(Collectors.toList());
         pageableResponse.setResponseBody(responseBody);
         return pageableResponse;
         /**return rfq with image id*/
