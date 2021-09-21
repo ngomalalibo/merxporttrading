@@ -244,8 +244,15 @@ public class UserServiceImpl implements UserService
     public String getImage(String imageID, int width, int height, String format) throws Exception
     {
         GridFSFile image = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(imageID)));
-        format = format == null ? "JPEG" : format;
+        
+        if (image == null)
+        {
+            String dummyImageID = "6149ce8ad31ade7e30ed93d7";
+            image = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(dummyImageID)));
+            format = "PNG";
+        }
         assert image != null;
+        format = format == null ? "JPEG" : format;
         if (width == 0 || height == 0)
         {
             assert image.getMetadata() != null;
@@ -308,6 +315,21 @@ public class UserServiceImpl implements UserService
     public User deleteUser(User user)
     {
         return deleteService.deleteEntity(user, mongoTemplate, userRepository);
+    }
+    
+    @Override
+    public User findByID(String id) throws IOException
+    {
+        User user = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        try
+        {
+            user.setImage(userService.getImage(user.getImageID(), 0, 0, null));
+            return user;
+        }
+        catch (Exception e)
+        {
+            throw new EntityNotFoundException("User not found");
+        }
     }
     
     @Override

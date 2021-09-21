@@ -6,6 +6,8 @@ import com.merxport.trading.enumerations.UserRole;
 import com.merxport.trading.enumerations.UserType;
 import com.merxport.trading.security.VerificationPOJO;
 import lombok.*;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +36,9 @@ public class User extends PersistingBaseEntity
     private boolean isVerified;
     private Scopes scope;
     private String imageID;
+    @Transient
+    @BsonIgnore
+    private String image;
     private List<UserRole> userRoles = new ArrayList<>();
     private String token;
     private VerificationPOJO verificationPOJO;

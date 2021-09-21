@@ -6,12 +6,15 @@ import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import com.google.gson.Gson;
 import com.merxport.trading.security.JwtTokenProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -20,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Locale;
 
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = TradingApplication.class) // Loads Server
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application.properties")
@@ -36,6 +40,12 @@ public class AbstractIntegrationTest
     @Qualifier("getObjectMapper")
     @Autowired
     protected ObjectMapper objectMapper;
+    
+    @Autowired
+    protected GridFsTemplate gridFsTemplate;
+    
+    @Autowired
+    protected GridFsOperations operations;
     
     @Autowired
     protected RestTemplate restTemplate;

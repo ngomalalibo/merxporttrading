@@ -1,6 +1,7 @@
 package com.merxport.trading.serviceImpl;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.merxport.trading.AbstractIntegrationTest;
 import com.merxport.trading.entities.Address;
 import com.merxport.trading.entities.User;
 import com.merxport.trading.enumerations.Scopes;
@@ -33,23 +34,11 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
-@AutoConfigureMockMvc
-@SpringBootTest
 // @TestPropertySource(locations = "classpath:application.properties")
-class UserServiceImplTest
+class UserServiceImplTest extends AbstractIntegrationTest
 {
     @Autowired
     private UserService userService;
-    
-    @Autowired
-    private GridFsTemplate gridFsTemplate;
-    
-    // @MockBean
-    // private UserRepository userRepository;
-    
-    // @Autowired
-    // private GridFsOperations operations;
     
     @TestConfiguration
     static class EmployeeServiceImplTestContextConfiguration
@@ -73,13 +62,13 @@ class UserServiceImplTest
         System.out.println("Current working directory: " + Paths.get(".").toAbsolutePath().normalize().toString());
         File file = new File("./src/main/resources/static/images/team4.jpg");
         FileInputStream input = new FileInputStream(file);
-        MultipartFile multipartFile = new MockMultipartFile("image.jpg", file.getName(), Files.probeContentType(file.toPath()), IOUtils.toByteArray(input));
+        MultipartFile multipartFile = new MockMultipartFile( file.getName(), file.getName(), Files.probeContentType(file.toPath()), IOUtils.toByteArray(input));
         
         String imageID = userService.upload(multipartFile);
         
         Address address = new Address("street", "city", "state", "country");
         
-        User user = new User("firstName", "lastName", "middleName", "test@email.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID, List.of(UserRole.BUYER, UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
+        User user = new User("firstName", "lastName", "middleName", "test@email.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID, null,List.of(UserRole.BUYER, UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
         User saved = userService.save(user);
         assertEquals(saved.getFirstName(), user.getFirstName());
         assertEquals(saved.getImageID(), user.getImageID());

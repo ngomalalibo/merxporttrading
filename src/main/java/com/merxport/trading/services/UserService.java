@@ -16,6 +16,8 @@ public interface UserService
     
     User findUser(String id) throws IOException;
     
+    User findByID(String id) throws IOException;
+    
     void resendCode(String id) throws UnirestException;
     
     User findByEmail(String email);

@@ -76,7 +76,7 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest
         ResponseEntity<String> imageID = restTemplate.postForEntity("/upload", body, String.class /*, typeReference*/);
         Address address = new Address("street", "city", "state", "country");
         
-        User user = new User("Ngoo", "Alaliboo", "Martin", "ngomalalibo@yahoo.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID.getBody(), List.of(UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
+        User user = new User("Ngoo", "Alaliboo", "Martin", "ngomalalibo@yahoo.com", "password", "08974938292", Collections.singletonList(address), false, Scopes.DOMESTIC, imageID.getBody(), null, List.of(UserRole.BUYER), null, null, null, null, null, null, false, null, UserType.BUSINESS);
         
         ResponseEntity<User> userResponseEntity = restTemplate.postForEntity("/user", user, User.class);
         assertEquals(201, userResponseEntity.getStatusCode().value());
