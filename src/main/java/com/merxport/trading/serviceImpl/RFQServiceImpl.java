@@ -63,6 +63,12 @@ public class RFQServiceImpl implements RFQService
     }
     
     @Override
+    public PageableResponse findAll(int page, int pageSize)
+    {
+        return findRFQs(new Criteria(), true, page, pageSize);
+    }
+    
+    @Override
     public PageableResponse findRFQByTitleLike(String title, int page, int pageSize)
     {
         return findRFQs(Criteria.where("title").regex(title, "i"), true, page, pageSize);

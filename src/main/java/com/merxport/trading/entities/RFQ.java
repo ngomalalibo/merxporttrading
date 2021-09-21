@@ -26,7 +26,9 @@ public class RFQ extends PersistingBaseEntity
     @NotBlank(message = "Title is mandatory")
     private String title;
     private String commodityID;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal rate;
+    private boolean isTotalPrice;
     private String unit;
     private int quantityRequired;
     private Map<String, String> specification;

@@ -12,6 +12,8 @@ public interface RFQService
     
     RFQ findByID(String id);
     
+    PageableResponse findAll(int page, int pageSize);
+    
     PageableResponse findRFQByTitleLike(String title, int page, int pageSize);
     
     PageableResponse findRFQByCommodityNameLike(String name, int page, int pageSize);

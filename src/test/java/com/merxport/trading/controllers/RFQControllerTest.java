@@ -3,7 +3,6 @@ package com.merxport.trading.controllers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.AbstractIntegrationTest;
-import com.merxport.trading.entities.Commodity;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.entities.Unit;
 import com.merxport.trading.enumerations.CommercialTerms;
@@ -53,6 +52,7 @@ class RFQControllerTest extends AbstractIntegrationTest
     private TypeReference<List<RFQ>> typeReferenceList = new TypeReference<>()
     {
     };
+    
     @Ignore
     @Test
     void saveRFQ()
@@ -73,9 +73,9 @@ class RFQControllerTest extends AbstractIntegrationTest
         {{
             put("id", id);
         }};
-    
+        
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer "+AuthenticationController.TOKEN);
+        headers.set("Authorization", "Bearer " + AuthenticationController.TOKEN);
         final HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
         
         ResponseEntity<RFQ> found = restTemplate.exchange("/api/rfq/{id}", HttpMethod.GET, jwtTokenProvider.getAuthorizationHeaderToken(), RFQ.class, uriVars);
@@ -175,6 +175,19 @@ class RFQControllerTest extends AbstractIntegrationTest
     }
     
     @Test
+    void findAll()
+    {
+        ResponseEntity<PageableResponse> result = restTemplate.exchange("/api/rfqs?page=1&pageSize=7", HttpMethod.GET, jwtTokenProvider.getAuthorizationHeaderToken(), typeReference);
+        PageableResponse pageableResponse = result.getBody();
+        assertNotNull(pageableResponse);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertNotNull(rfqs);
+        rfqs.forEach(r -> System.out.println(r.getTitle()));
+        assertEquals(7, rfqs.size());
+        assertEquals("Incredible Paper Bag", rfqs.get(0).getTitle());
+    }
+    
+    @Test
     void findByBuyer()
     {
         //https://merxporttrading.herokuapp.com/api/rfq/6144f7ed917f5805fe9a2c43/buyer?page=1&pageSize=10
@@ -201,7 +214,7 @@ class RFQControllerTest extends AbstractIntegrationTest
         Currency naira = Currency.getInstance("NGN");
         return new RFQ(faker.commerce().productName(),
                        "6130ff9f4ed20e41b43a503c",
-                       new BigDecimal(20000), unit.getSingularName(),
+                       new BigDecimal(20000), true, unit.getSingularName(),
                        faker.number().numberBetween(1, 100),
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),

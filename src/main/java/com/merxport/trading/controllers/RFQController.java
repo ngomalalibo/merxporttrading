@@ -83,4 +83,10 @@ public class RFQController
     {
         return ResponseEntity.ok(rfqService.findRFQByTitleLike(title, page, pageSize));
     }
+    
+    @GetMapping("/rfqs")
+    public ResponseEntity<PageableResponse> findAll(@RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
+    {
+        return ResponseEntity.ok(rfqService.findAll(page, pageSize));
+    }
 }

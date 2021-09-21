@@ -58,7 +58,7 @@ class RFQServiceImplTest extends AbstractIntegrationTest
         Currency naira = Currency.getInstance("NGN");
         return new RFQ(faker.commerce().productName(),
                        "6130ff9f4ed20e41b43a503c",
-                       new BigDecimal(20000), unit.getSingularName(),
+                       new BigDecimal(20000), true, unit.getSingularName(),
                        faker.number().numberBetween(1, 100),
                        null, "QCDoc", RFQPriority.MEDIUM,
                        faker.number().numberBetween(10, 20),
@@ -83,6 +83,15 @@ class RFQServiceImplTest extends AbstractIntegrationTest
         RFQ deleted = rfqService.delete(rfqRepository.findById(id).orElse(null));
         assertNotNull(deleted);
         assertFalse(deleted.isActive());
+    }
+    
+    @Test
+    void findAll()
+    {
+        PageableResponse pageableResponse = rfqService.findAll( 0, 10);
+        List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
+        assertEquals(9  , rfqs.size());
+        assertEquals("Gorgeous Granite Gloves", rfqs.get(0).getTitle());
     }
     
     @Test
