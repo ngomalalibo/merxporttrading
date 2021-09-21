@@ -1,10 +1,13 @@
 package com.merxport.trading.security;
 
+import com.merxport.trading.controllers.AuthenticationController;
 import com.merxport.trading.entities.User;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -165,5 +168,12 @@ public class JwtTokenProvider
             throw new AccessDeniedException("Provide a valid token");
         }
         return token;
+    }
+    
+    public HttpEntity getAuthorizationHeaderToken()
+    {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + AuthenticationController.TOKEN);
+        return new HttpEntity<String>(null, headers);
     }
 }

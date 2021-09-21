@@ -31,7 +31,7 @@ public class UserController
     }
     
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers(@RequestParam("token") String token) throws IOException
+    public ResponseEntity<List<User>> getUsers() throws IOException
     {
         return ResponseEntity.ok(userService.getActiveUsers());
     }

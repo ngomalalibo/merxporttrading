@@ -8,7 +8,6 @@ import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.security.JwtTokenProvider;
 import com.merxport.trading.services.RFQService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,13 +41,13 @@ public class RFQController
     @GetMapping("/rfq/{id}")
     public ResponseEntity<RFQ> getRFQ(@PathVariable String id, HttpServletRequest req) throws IOException, ServletException
     {
-        RFQ rfq = rfqRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        RFQ rfq = rfqService.findByID(id);
         rfq.setSessionUser(jwtTokenProvider.getUsername(jwtTokenProvider.getTokenFromRequestHeader(req)));
         return ResponseEntity.ok(rfq);
     }
     
     @GetMapping("/rfq/{buyerID}/buyer")
-    public ResponseEntity<PageableResponse> getRFQByBUyer(@PathVariable String buyerID, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
+    public ResponseEntity<PageableResponse> getRFQByBuyer(@PathVariable String buyerID, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
         return ResponseEntity.ok(rfqService.findRFQByBuyer(buyerID, page, pageSize));
     }
@@ -62,25 +61,25 @@ public class RFQController
     }
     
     @GetMapping("/rfqByCommodityName/{name}")
-    public ResponseEntity<PageableResponse> findByCommodityName(@PathVariable String name, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
+    public ResponseEntity<PageableResponse> findByCommodityName(@PathVariable String name, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
         return ResponseEntity.ok(rfqService.findRFQByCommodityNameLike(name, page, pageSize));
     }
     
     @GetMapping("/rfqByCountry/{country}")
-    public ResponseEntity<PageableResponse> findByCountry(@PathVariable String country, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
+    public ResponseEntity<PageableResponse> findByCountry(@PathVariable String country, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
         return ResponseEntity.ok(rfqService.findRFQByCountry(country, page, pageSize));
     }
     
     @GetMapping("/rfqByTerm/{term}")
-    public ResponseEntity<PageableResponse> findByTerm(@PathVariable String term, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
+    public ResponseEntity<PageableResponse> findByTerm(@PathVariable String term, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
         return ResponseEntity.ok(rfqService.findRFQByTerm(CommercialTerms.fromValue(term), page, pageSize));
     }
     
     @GetMapping("/rfqByTitle/{title}")
-    public ResponseEntity<PageableResponse> findByTitle(@PathVariable String title, @RequestParam("page") int page, @RequestParam("pageSize")int pageSize) throws IOException
+    public ResponseEntity<PageableResponse> findByTitle(@PathVariable String title, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
         return ResponseEntity.ok(rfqService.findRFQByTitleLike(title, page, pageSize));
     }

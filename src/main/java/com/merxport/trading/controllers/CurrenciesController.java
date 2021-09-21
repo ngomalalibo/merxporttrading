@@ -2,7 +2,10 @@ package com.merxport.trading.controllers;
 
 import com.merxport.trading.services.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Currency;
@@ -22,7 +25,7 @@ public class CurrenciesController
     }
     
     @GetMapping("/currencies")
-    public List<String> getCurrencies(@RequestParam("token") String token)
+    public List<String> getCurrencies()
     {
         return new ArrayList<>(currencyService.getCurrencies().keySet());
     }

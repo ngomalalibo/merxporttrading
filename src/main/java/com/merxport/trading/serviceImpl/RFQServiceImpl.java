@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merxport.trading.aspect.Loggable;
 import com.merxport.trading.entities.RFQ;
 import com.merxport.trading.enumerations.CommercialTerms;
+import com.merxport.trading.exception.EntityNotFoundException;
 import com.merxport.trading.repositories.RFQRepository;
 import com.merxport.trading.response.PageableResponse;
 import com.merxport.trading.services.RFQService;
@@ -84,12 +85,20 @@ public class RFQServiceImpl implements RFQService
         return findRFQs(Criteria.where("term").is(term), true, page, pageSize);
     }
     
+    @Override
+    public RFQ findByID(String id)
+    {
+        RFQ rfq = rfqRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        rfq.setSampleImage(restTemplate.getForEntity("/getImage/{id}", String.class, rfq.getSampleImageID()).getBody());
+        return rfq;
+    }
+    
     public PageableResponse findRFQs(Criteria criteria, boolean isActive, int page, int pageSize)
     {
         /**populate rfq with image from image id*/
         PageableResponse pageableResponse = findService.find(new RFQ(), "rfqs", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
         List<RFQ> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList)
-                                             .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("/getImage/{id}", String.class, rfq.getId()).getBody())).collect(Collectors.toList());
+                                             .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("/getImage/{id}", String.class, rfq.getSampleImageID()).getBody())).collect(Collectors.toList());
         pageableResponse.setResponseBody(responseBody);
         return pageableResponse;
         /**return rfq with image id*/

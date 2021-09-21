@@ -165,7 +165,7 @@ public class CommodityServiceImpl implements CommodityService
         pr.setCurrentPage(page);
         int totalSize = commodities.size();
         pr.setTotalItems(totalSize);
-        int offset = page * pageSize;
+        int offset = page == 1 ? 0 : page * pageSize;
         if (offset < totalSize && (offset + pageSize) < totalSize)
         {
             pr.setResponseBody(commodities.subList(offset, offset + pageSize));

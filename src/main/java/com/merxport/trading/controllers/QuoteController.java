@@ -61,14 +61,14 @@ public class QuoteController
     }
     
     @GetMapping("/quotes")
-    public ResponseEntity<List<Quote>> getQuotes(@RequestParam("token") String token, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
+    public ResponseEntity<List<Quote>> getQuotes( @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
-        Page<Quote> all = quoteRepository.findAll(PageRequest.of(page, pageSize));
+        Page<Quote> all = quoteRepository.findAll(PageRequest.of(page-1, pageSize));
         return ResponseEntity.ok(all.getContent());
     }
     
     @GetMapping("/quotesActive")
-    public ResponseEntity<PageableResponse> getQuotesActive(@RequestParam("token") String token, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
+    public ResponseEntity<PageableResponse> getQuotesActive( @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) throws IOException
     {
         return ResponseEntity.ok(quoteService.findAllActive(page, pageSize));
     }

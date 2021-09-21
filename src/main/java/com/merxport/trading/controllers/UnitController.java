@@ -53,7 +53,7 @@ public class UnitController
     }
     
     @GetMapping("/units")
-    public ResponseEntity<List<Unit>> getAllUnits(@RequestParam("token") String token) throws IOException
+    public ResponseEntity<List<Unit>> getAllUnits() throws IOException
     {
         return ResponseEntity.ok(unitRepository.findAll());
     }

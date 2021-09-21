@@ -5,6 +5,7 @@ import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import com.google.gson.Gson;
+import com.merxport.trading.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,6 +41,9 @@ public class AbstractIntegrationTest
     protected RestTemplate restTemplate;
     
     protected MockMvc mockMvc;
+    
+    @Autowired
+    protected JwtTokenProvider jwtTokenProvider;
     
     @Qualifier("getGsonBean")
     @Autowired

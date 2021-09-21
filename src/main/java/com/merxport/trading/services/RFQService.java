@@ -10,6 +10,8 @@ public interface RFQService
     
     RFQ delete(RFQ rfq);
     
+    RFQ findByID(String id);
+    
     PageableResponse findRFQByTitleLike(String title, int page, int pageSize);
     
     PageableResponse findRFQByCommodityNameLike(String name, int page, int pageSize);

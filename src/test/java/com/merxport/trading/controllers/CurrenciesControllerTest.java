@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CurrenciesControllerTest extends AbstractIntegrationTest
 {
-    private final ParameterizedTypeReference<List<Currency>> paramTypeReference = new ParameterizedTypeReference<>()
+    private final ParameterizedTypeReference<List<String>> paramTypeReference = new ParameterizedTypeReference<>()
     {
     };
     private TypeReference<List<Currency>> typeReferenceList = new TypeReference<>()
@@ -28,7 +28,7 @@ class CurrenciesControllerTest extends AbstractIntegrationTest
     @Test
     void getCurrency()
     {
-        ResponseEntity<Currency> ngn = restTemplate.getForEntity("/api/currency/{code}?token="+AuthenticationController.TOKEN, Currency.class, "NGN");
+        ResponseEntity<Currency> ngn = restTemplate.exchange("/api/currency/{code}", HttpMethod.GET, jwtTokenProvider.getAuthorizationHeaderToken(),  Currency.class, "NGN");
         assertNotNull(ngn.getBody());
         assertEquals("Nigerian Naira", ngn.getBody().getDisplayName());
     }
@@ -36,8 +36,8 @@ class CurrenciesControllerTest extends AbstractIntegrationTest
     @Test
     void getCurrencies()
     {
-        ResponseEntity<List<Currency>> ngn = restTemplate.exchange("/api/currencies?token="+AuthenticationController.TOKEN, HttpMethod.GET.GET, null, paramTypeReference);
+        ResponseEntity<List<String>> ngn = restTemplate.exchange("/api/currencies", HttpMethod.GET, jwtTokenProvider.getAuthorizationHeaderToken(), paramTypeReference);
         assertNotNull(ngn.getBody());
-        assertTrue(ngn.getBody().size() > 20 );
+        assertEquals(228, ngn.getBody().size());
     }
 }
