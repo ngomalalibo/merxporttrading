@@ -14,7 +14,7 @@ class UploadControllerTest extends AbstractIntegrationTest
     void getImage()
     {
         String id = "6126a4817f80646d7836a04f";
-        ResponseEntity<String> res = restTemplate.exchange("/getImage/{id}", HttpMethod.GET, jwtTokenProvider.getAuthorizationHeaderToken(), String.class, id);
+        ResponseEntity<String> res = restTemplate.exchange("https://merxporttrading.herokuapp.com/getImage/{id}", HttpMethod.GET, jwtTokenProvider.getAuthorizationHeaderToken(), String.class, id);
         String image = res.getBody();
         System.out.println(image);
     }

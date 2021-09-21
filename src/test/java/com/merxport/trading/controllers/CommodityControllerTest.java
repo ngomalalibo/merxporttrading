@@ -285,12 +285,12 @@ class CommodityControllerTest extends AbstractIntegrationTest
         headers.set("Authorization", "Bearer " + AuthenticationController.TOKEN);
         HttpEntity<CommodityRequest> requestEntity = new HttpEntity<>(cr, headers);
         
-        ResponseEntity<PageableResponse> body = restTemplate.exchange("/api/commodityMultiSearch?page=1&pageSize=6", HttpMethod.POST, requestEntity, typeReference, cr);
+        ResponseEntity<PageableResponse> body = restTemplate.exchange("https://merxporttrading.herokuapp.com/api/commodityMultiSearch?page=1&pageSize=6", HttpMethod.POST, requestEntity, typeReference, cr);
         assertNotNull(body);
         PageableResponse pageableResponse = body.getBody();
         assertNotNull(pageableResponse);
         List<Commodity> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         Assertions.assertEquals(6, responseBody.size());
-        assertTrue(responseBody.get(0).getDescription().contains("Descriptio"));
+        assertTrue(responseBody.get(0).getDescription().contains("Description"));
     }
 }

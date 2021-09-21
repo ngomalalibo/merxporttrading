@@ -188,8 +188,8 @@ class RFQControllerTest extends AbstractIntegrationTest
         assertNotNull(pageableResponse);
         List<RFQ> rfqs = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList);
         assertNotNull(rfqs);
-        // assertEquals(1, rfqs.size());
-        // assertEquals("Enormous Silk Knife", rfqs.get(0).getTitle());
+        assertEquals(3, rfqs.size());
+        assertEquals("request title", rfqs.get(0).getTitle());
     }
     
     public RFQ getRFQ()

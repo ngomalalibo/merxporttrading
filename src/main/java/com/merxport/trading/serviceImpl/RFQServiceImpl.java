@@ -98,7 +98,7 @@ public class RFQServiceImpl implements RFQService
         /**populate rfq with image from image id*/
         PageableResponse pageableResponse = findService.find(new RFQ(), "rfqs", criteria, isActive, pageSize, page, Sort.by(Sort.Direction.ASC, "audit.createdDate"));
         List<RFQ> responseBody = objectMapper.convertValue(pageableResponse.getResponseBody(), typeReferenceList)
-                                             .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("/getImage/{id}", String.class, rfq.getSampleImageID()).getBody())).collect(Collectors.toList());
+                                             .stream().peek(rfq -> rfq.setSampleImage(restTemplate.getForEntity("https://merxporttrading.herokuapp.com/getImage/{id}", String.class, rfq.getSampleImageID()).getBody())).collect(Collectors.toList());
         pageableResponse.setResponseBody(responseBody);
         return pageableResponse;
         /**return rfq with image id*/
